@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DupeSMP | Support Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0d0a14;
+            --card-bg: #151122;
+            --card-hover: #1e1830;
+            --border-clr: #2d2446;
+            --accent-purple: #9d4edd;
+            --accent-hover: #b57eed;
+            --text-main: #ffffff;
+            --text-muted: #a39bc2;
+            --success-green: #38b000;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        html, body {
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(rgba(157, 78, 221, 0.08) 1px, transparent 0);
+            background-size: 24px 24px;
+            color: var(--text-main);
+            width: 100%;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 40px;
+            background-color: #08060f;
+            border-bottom: 1px solid var(--border-clr);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1.25rem;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #7b2cbf, #c77dff);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            box-shadow: 0 0 12px rgba(157, 78, 221, 0.4);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn {
+            background-color: var(--accent-purple);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: background 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 12px rgba(157, 78, 221, 0.3);
+        }
+        .btn:hover { 
+            background-color: var(--accent-hover); 
+            box-shadow: 0 4px 16px rgba(157, 78, 221, 0.5);
+        }
+
+        .btn-secondary {
+            background-color: #241d3b;
+            color: #d8d0ef;
+            box-shadow: none;
+        }
+        .btn-secondary:hover { background-color: #31284f; }
+
+        .btn-danger {
+            background-color: #d90429;
+            box-shadow: none;
+        }
+        .btn-danger:hover { background-color: #ef233c; }
+
+        main {
+            flex: 1;
+            max-width: 950px;
+            width: 100%;
+            margin: 40px auto;
+            padding: 0 20px 40px 20px;
+        }
+
+        .hidden { display: none !important; }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .hero h1 {
+            font-size: 2.8rem;
+            font-weight: 900;
+            font-family: monospace;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            background: linear-gradient(180deg, #ffffff 0%, #c77dff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+        }
+
+        .search-wrap {
+            max-width: 620px;
+            margin: 0 auto 30px auto;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 15px 18px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-clr);
+            border-radius: 10px;
+            color: white;
+            font-size: 0.92rem;
+            outline: none;
+        }
+        .search-box:focus { border-color: var(--accent-purple); }
+
+        .sec-title {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin-bottom: 16px;
+            margin-top: 20px;
+        }
+        .sec-title h2 { font-size: 1.15rem; font-weight: 700; }
+        .sec-title span { color: var(--text-muted); font-size: 0.82rem; }
+
+        .cat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: 14px;
+            margin-bottom: 30px;
+        }
+
+        .cat-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-clr);
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.15s ease, background 0.15s ease;
+        }
+        .cat-card:hover {
+            background-color: var(--card-hover);
+            transform: translateY(-2px);
+        }
+
+        .card-top {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .card-ico {
+            width: 38px;
+            height: 38px;
+            background: #241d3b;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .card-txt h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 3px; }
+        .card-txt p { font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; }
+
+        .start-lnk {
+            background: none; border: none; color: #c77dff;
+            font-size: 0.82rem; font-weight: 600; cursor: pointer; text-align: left; padding: 0;
+        }
+        .start-lnk:hover { text-decoration: underline; }
+
+        .ticket-list-item {
+            background: #0d0a14;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-clr);
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .unread-badge {
+            background-color: #d90429;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 10px;
+            margin-left: 10px;
+            display: inline-block;
+            box-shadow: 0 0 8px rgba(217, 4, 41, 0.6);
+        }
+
+        /* Staff Panel Dropdown / Frame Styles */
+        .staff-panel-wrapper {
+            position: relative;
+        }
+
+        .staff-dropdown-frame {
+            position: absolute;
+            top: 45px;
+            right: 0;
+            width: 380px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--accent-purple);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            z-index: 200;
+        }
+
+        .staff-dropdown-frame h3 {
+            font-size: 1rem;
+            margin-bottom: 12px;
+            color: #c77dff;
+            border-bottom: 1px solid var(--border-clr);
+            padding-bottom: 6px;
+        }
+
+        .staff-db-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.78rem;
+            margin-top: 10px;
+        }
+        .staff-db-table th, .staff-db-table td {
+            border: 1px solid var(--border-clr);
+            padding: 6px 8px;
+            text-align: left;
+        }
+        .staff-db-table th {
+            background-color: #1f1635;
+            color: #c77dff;
+        }
+
+        .chat-container {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-clr);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 540px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            background: #0d0a14;
+            border: 1px solid var(--border-clr);
+            border-radius: 8px;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .chat-msg {
+            padding: 10px 14px;
+            border-radius: 8px;
+            max-width: 75%;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .chat-msg.user {
+            background: #241d3b;
+            align-self: flex-end;
+            border: 1px solid #3d2f66;
+        }
+
+        .chat-msg.bot {
+            background: #2a1b4e;
+            align-self: flex-start;
+            border: 1px solid #7b2cbf;
+        }
+
+        .chat-msg.admin {
+            background: #3c155c;
+            align-self: flex-start;
+            border: 1px solid #5a189a;
+        }
+
+        .quick-replies-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .qr-btn {
+            background-color: #1f1635;
+            color: #d8d0ef;
+            border: 1px solid var(--accent-purple);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+        .qr-btn:hover {
+            background-color: var(--accent-purple);
+            color: white;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 12px;
+            background: #0d0a14;
+            border: 1px solid var(--border-clr);
+            border-radius: 6px;
+            color: white;
+            outline: none;
+        }
+
+        .profile-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-clr);
+            padding: 30px;
+            border-radius: 12px;
+        }
+
+        .profile-card h2 { font-size: 1.5rem; margin-bottom: 6px; }
+        .profile-card > p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px; }
+
+        .input-group { margin-bottom: 16px; }
+        .input-group label { display: block; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; text-transform: uppercase; }
+        .input-group input, .input-group select { width: 100%; padding: 12px; background: #0d0a14; border: 1px solid var(--border-clr); border-radius: 6px; color: white; font-size: 0.9rem; outline: none; }
+
+        .platform-btns {
+            display: flex; gap: 8px; margin-top: 6px;
+        }
+        .plat-btn {
+            flex: 1; padding: 10px; background: #0d0a14; border: 1px solid var(--border-clr);
+            border-radius: 6px; color: var(--text-muted); font-weight: 600; cursor: pointer; font-size: 0.85rem;
+        }
+        .plat-btn.active { background: var(--accent-purple); color: white; border-color: var(--accent-purple); }
+
+        .modal {
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); 
+            backdrop-filter: blur(4px); 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 1000;
+        }
+        .modal.active { display: flex !important; }
+        
+        .modal-body {
+            background: var(--card-bg); 
+            padding: 30px; 
+            border-radius: 12px; 
+            width: 390px; 
+            border: 1px solid var(--border-clr);
+        }
+        .modal-body input {
+            width: 100%; padding: 12px; background: #0d0a14; border: 1px solid var(--border-clr);
+            border-radius: 6px; color: white; margin-top: 6px; margin-bottom: 14px; outline: none;
+        }
+
+        .modal-tabs {
+            display: flex; 
+            background: #0d0a14; 
+            border-radius: 6px; 
+            padding: 3px; 
+            margin-bottom: 16px; 
+            border: 1px solid var(--border-clr);
+        }
+
+        .m-tab {
+            flex: 1; 
+            background: none; 
+            border: none; 
+            color: var(--text-muted); 
+            padding: 8px; 
+            font-weight: 600; 
+            font-size: 0.8rem; 
+            cursor: pointer; 
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        .m-tab.active { background: var(--accent-purple); color: white; }
+    </style>
+</head>
+<body>
+
+    <script>
+        // Clean wipe of all previous stored session data on load
+        localStorage.removeItem('dupesmp_tickets_db');
+        localStorage.removeItem('dupesmp_staff_db');
+        for (let i = localStorage.length - 1; i >= 0; i--) {
+            let key = localStorage.key(i);
+            if (key && key.startsWith('dupesmp_profile_')) {
+                localStorage.removeItem(key);
+            }
+        }
+    </script>
+
+    <header>
+        <div class="logo-area">
+            <div class="logo-icon">🔮</div>
+            DupeSMP Support
+        </div>
+        <div class="header-actions" id="header-nav">
+            <button class="btn btn-secondary" onclick="openModal('login')">Login</button>
+        </div>
+    </header>
+
+    <main>
+        <div id="view-home">
+            <div class="hero">
+                <h1>How can we help?</h1>
+                <p>Search quick answers or open a ticket to chat live with DupeSMP staff.</p>
+            </div>
+
+            <div class="search-wrap">
+                <input type="text" class="search-box" placeholder="Search help... e.g. dupes, ban appeal, items">
+            </div>
+
+            <div class="sec-title">
+                <h2>Open a ticket</h2>
+                <span>pick a category — start a live text chat with staff</span>
+            </div>
+
+            <div class="cat-grid">
+                <div class="cat-card">
+                    <div class="card-top">
+                        <div class="card-ico">💬</div>
+                        <div class="card-txt">
+                            <h4>General Support</h4>
+                            <p>Crashes, lag, connection issues and bugs.</p>
+                        </div>
+                    </div>
+                    <button class="start-lnk" onclick="createNewTicket('General Support')">Start ticket →</button>
+                </div>
+
+                <div class="cat-card">
+                    <div class="card-top">
+                        <div class="card-ico">🛒</div>
+                        <div class="card-txt">
+                            <h4>Purchase support</h4>
+                            <p>Ranks, store items, tokens and billing.</p>
+                        </div>
+                    </div>
+                    <button class="start-lnk" onclick="createNewTicket('Purchase support')">Start ticket →</button>
+                </div>
+
+                <div class="cat-card">
+                    <div class="card-top">
+                        <div class="card-ico">⚡</div>
+                        <div class="card-txt">
+                            <h4>Bug support</h4>
+                            <p>Duplication exploits, errors and glitches.</p>
+                        </div>
+                    </div>
+                    <button class="start-lnk" onclick="createNewTicket('Bug support')">Start ticket →</button>
+                </div>
+
+                <div class="cat-card">
+                    <div class="card-top">
+                        <div class="card-ico">🎥</div>
+                        <div class="card-txt">
+                            <h4>Media application</h4>
+                            <p>Apply for content creator roles and perks.</p>
+                        </div>
+                    </div>
+                    <button class="start-lnk" onclick="createNewTicket('Media application')">Start ticket →</button>
+                </div>
+
+                <div class="cat-card">
+                    <div class="card-top">
+                        <div class="card-ico">🔨</div>
+                        <div class="card-txt">
+                            <h4>Ban appeal</h4>
+                            <p>Appeal a ban, mute or server restriction.</p>
+                        </div>
+                    </div>
+                    <button class="start-lnk" onclick="createNewTicket('Ban appeal')">Start ticket →</button>
+                </div>
+
+                <div class="cat-card">
+                    <div class="card-top">
+                        <div class="card-ico">🛡️</div>
+                        <div class="card-txt">
+                            <h4>Player report</h4>
+                            <p>Report rule breakers, hackers or exploiters.</p>
+                        </div>
+                    </div>
+                    <button class="start-lnk" onclick="createNewTicket('Player report')">Start ticket →</button>
+                </div>
+            </div>
+
+            <div id="ticket-dashboard-section" class="hidden">
+                <div class="sec-title">
+                    <h2>Opened Tickets</h2>
+                    <span>active conversations with staff</span>
+                </div>
+                <div id="opened-tickets-container"></div>
+
+                <div class="sec-title" style="margin-top: 30px;">
+                    <h2>Recent / Closed Tickets</h2>
+                    <span>archived or resolved support history</span>
+                </div>
+                <div id="closed-tickets-container"></div>
+            </div>
+        </div>
+
+        <div id="view-profile" class="hidden">
+            <div class="profile-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div>
+                        <h2>Profile Settings</h2>
+                        <p style="margin-bottom: 0;">Configure your player information for support tickets.</p>
+                    </div>
+                    <button class="btn" onclick="autoFillProfileSettings()">Auto-Fill Profile</button>
+                </div>
+
+                <div class="input-group" style="background: #0d0a14; padding: 15px; border-radius: 8px; border: 1px solid var(--border-clr); margin-bottom: 20px;">
+                    <label style="color: #c77dff; margin-bottom: 4px;">Active In-Game API Code / Account</label>
+                    <input type="text" id="prof-code" readonly style="background: #151122 !important; font-family: monospace; font-weight: bold; letter-spacing: 1px;">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;" class="input-group">
+                    <div>
+                        <label>Minecraft IGN</label>
+                        <input type="text" id="prof-ign" placeholder="Enter IGN...">
+                    </div>
+                    <div>
+                        <label>Discord Username</label>
+                        <input type="text" id="prof-disc" placeholder="e.g. dupegod">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;" class="input-group">
+                    <div>
+                        <label>Minecraft Version</label>
+                        <input type="text" id="prof-version" placeholder="e.g. 1.21.11">
+                    </div>
+                    <div>
+                        <label>Platform</label>
+                        <div class="platform-btns" style="margin-top: 0;">
+                            <button class="plat-btn active" id="p-java" onclick="setPlatform('Java')">Java</button>
+                            <button class="plat-btn" id="p-bedrock" onclick="setPlatform('Bedrock')">Bedrock</button>
+                            <button class="plat-btn" id="p-both" onclick="setPlatform('Both')">Both</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sec-title" style="margin-top: 25px; margin-bottom: 12px;">
+                    <h2>Social Media Links</h2>
+                    <span>used for media applications & verification</span>
+                </div>
+                <div class="input-group">
+                    <label>YouTube Link</label>
+                    <input type="text" id="prof-yt" placeholder="https://youtube.com/@yourchannel">
+                </div>
+                <div class="input-group">
+                    <label>Twitch Link</label>
+                    <input type="text" id="prof-twitch" placeholder="https://twitch.tv/yourchannel">
+                </div>
+                <div class="input-group">
+                    <label>TikTok Link</label>
+                    <input type="text" id="prof-tiktok" placeholder="https://tiktok.com/@yourchannel">
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 25px;">
+                    <button class="btn" onclick="saveProfile()">Save Profile</button>
+                    <button class="btn btn-secondary" onclick="goHome()">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-chat" class="hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <button class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.8rem;" onclick="goHome()">← Back to Dashboard</button>
+                <div>
+                    <h3 id="chat-header-title" style="font-size: 1rem; color: #c77dff;">Ticket Chat</h3>
+                    <span id="chat-header-status" style="font-size: 0.75rem; color: var(--text-muted);">Status: Open</span>
+                </div>
+                <button id="close-ticket-btn" class="btn btn-danger" style="padding: 6px 14px; font-size: 0.8rem;" onclick="toggleCloseTicket()">Close Ticket</button>
+            </div>
+
+            <div class="chat-container">
+                <div class="chat-messages" id="chat-messages-box"></div>
+                <div class="quick-replies-bar" id="quick-replies-bar"></div>
+
+                <div class="chat-input-area" id="chat-input-row">
+                    <input type="text" id="chat-message-input" placeholder="Type a message to chat with staff..." onkeypress="if(event.key === 'Enter') sendChatMessage()">
+                    <button class="btn" onclick="sendChatMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="auth-modal" class="modal" onclick="if(event.target === this) closeModal()">
+        <div class="modal-body">
+            <div class="modal-tabs">
+                <button class="m-tab active" id="tab-player" onclick="switchAuthMode('player')">Player Code Login</button>
+                <button class="m-tab" id="tab-staff" onclick="switchAuthMode('staff')">Staff Portal</button>
+            </div>
+
+            <div id="pane-player">
+                <h3 style="font-size: 1.1rem; margin-bottom: 6px;">Minecraft Code Login</h3>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Enter the 8-character code generated from <code>/api create</code> in-game.</p>
+                <label style="font-size: 0.75rem; color: var(--text-muted);">API Code</label>
+                <input type="text" id="login-code-input" placeholder="e.g. A9B2X7K1" maxlength="8" style="text-transform: uppercase;">
+                <button class="btn" style="width: 100%;" onclick="submitCodeLogin()">Verify & Enter</button>
+            </div>
+
+            <div id="pane-staff" class="hidden">
+                <div style="display: flex; gap: 5px; margin-bottom: 12px;">
+                    <button class="btn btn-secondary" id="staff-subtab-in" style="flex:1; font-size:0.75rem; padding:6px;" onclick="switchStaffSub('in')">Staff Login</button>
+                    <button class="btn btn-secondary" id="staff-subtab-up" style="flex:1; font-size:0.75rem; padding:6px;" onclick="switchStaffSub('up')">Staff Signup</button>
+                </div>
+
+                <div id="staff-pane-in">
+                    <h3 style="font-size: 1.05rem; margin-bottom: 4px;">Staff Login</h3>
+                    <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px;">Restricted to approved staff members.</p>
+                    <label style="font-size: 0.72rem; color: var(--text-muted);">Staff API Code</label>
+                    <input type="text" id="staff-login-code" placeholder="8-char API code" maxlength="8" style="text-transform: uppercase;">
+                    <label style="font-size: 0.72rem; color: var(--text-muted);">Password</label>
+                    <input type="password" id="staff-login-pass" placeholder="••••••••">
+                    <button class="btn" style="width: 100%;" onclick="submitStaffLogin()">Staff Sign In</button>
+                </div>
+
+                <div id="staff-pane-up" class="hidden">
+                    <h3 style="font-size: 1.05rem; margin-bottom: 4px;">Staff Signup</h3>
+                    <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px;">Authorized MC Name: valid name or uuid here</p>
+                    <label style="font-size: 0.72rem; color: var(--text-muted);">Minecraft Username</label>
+                    <input type="text" id="staff-reg-user" placeholder="Username or uuid here">
+                    <label style="font-size: 0.72rem; color: var(--text-muted);">Staff API Code</label>
+                    <input type="text" id="staff-reg-code" placeholder="8-char API code" maxlength="8" style="text-transform: uppercase;">
+                    <label style="font-size: 0.72rem; color: var(--text-muted);">Password</label>
+                    <input type="password" id="staff-reg-pass" placeholder="••••••••">
+                    <button class="btn" style="width: 100%;" onclick="submitStaffRegister()">Create Staff Account</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const allowedStaffNames = ["CLOCKWRX", "ZANECPVP", "PROLEGOBOY", "SWORDGODD"];
+
+        let currentSession = null; 
+        let selectedPlatform = "Java";
+        let activeTicketId = null;
+        let ticketsDatabase = [];
+
+        function openModal(mode) {
+            document.getElementById('auth-modal').classList.add('active');
+            if(mode === 'staff') {
+                switchAuthMode('staff');
+            } else {
+                switchAuthMode('player');
+            }
+        }
+        function closeModal() { document.getElementById('auth-modal').classList.remove('active'); }
+
+        function switchAuthMode(mode) {
+            if(mode === 'player') {
+                document.getElementById('tab-player').classList.add('active');
+                document.getElementById('tab-staff').classList.remove('active');
+                document.getElementById('pane-player').classList.remove('hidden');
+                document.getElementById('pane-staff').classList.add('hidden');
+            } else {
+                document.getElementById('tab-staff').classList.add('active');
+                document.getElementById('tab-player').classList.remove('active');
+                document.getElementById('pane-staff').classList.remove('hidden');
+                document.getElementById('pane-player').classList.add('hidden');
+                switchStaffSub('in');
+            }
+        }
+
+        function switchStaffSub(sub) {
+            if(sub === 'in') {
+                document.getElementById('staff-subtab-in').classList.add('active');
+                document.getElementById('staff-subtab-up').classList.remove('active');
+                document.getElementById('staff-pane-in').classList.remove('hidden');
+                document.getElementById('staff-pane-up').classList.add('hidden');
+            } else {
+                document.getElementById('staff-subtab-up').classList.add('active');
+                document.getElementById('staff-subtab-in').classList.remove('active');
+                document.getElementById('staff-pane-up').classList.remove('hidden');
+                document.getElementById('staff-pane-in').classList.add('hidden');
+            }
+        }
+
+        function submitCodeLogin() {
+            const code = document.getElementById('login-code-input').value.trim().toUpperCase();
+            if (!code || code.length !== 8) return alert("Please enter a valid 8-character code.");
+
+            currentSession = { identifier: code, name: code, isStaff: false };
+            closeModal();
+            updateUIAfterLogin();
+        }
+
+        function submitStaffLogin() {
+            const code = document.getElementById('staff-login-code').value.trim().toUpperCase();
+            const pass = document.getElementById('staff-login-pass').value.trim();
+            if (!code || code.length !== 8 || !pass) return alert("Please provide a valid 8-character API code and password.");
+
+            let staffDb = JSON.parse(localStorage.getItem('dupesmp_staff_db')) || {};
+            let foundStaffName = null;
+            
+            for (let name in staffDb) {
+                if (staffDb[name].code === code && staffDb[name].pass === pass) {
+                    foundStaffName = name;
+                    break;
+                }
+            }
+
+            if (!foundStaffName) {
+                return alert("Invalid staff API code or password. Make sure you signed up first.");
+            }
+
+            currentSession = { identifier: code, name: foundStaffName, isStaff: true };
+            closeModal();
+            updateUIAfterLogin();
+        }
+
+        function submitStaffRegister() {
+            const username = document.getElementById('staff-reg-user').value.trim();
+            const code = document.getElementById('staff-reg-code').value.trim().toUpperCase();
+            const pass = document.getElementById('staff-reg-pass').value.trim();
+            
+            if (!username || !code || code.length !== 8 || !pass) {
+                return alert("Please fill out all fields correctly (Code must be 8 characters).");
+            }
+
+            if (!allowedStaffNames.includes(username.toUpperCase())) {
+                return alert("Registration Failed: Only Verified staff can hold staff accounts.");
+            }
+
+            let staffDb = JSON.parse(localStorage.getItem('dupesmp_staff_db')) || {};
+            staffDb[username.toUpperCase()] = { code: code, pass: pass };
+            localStorage.setItem('dupesmp_staff_db', JSON.stringify(staffDb));
+
+            alert("Staff account created successfully! You can now sign in using your API code.");
+            switchStaffSub('in');
+            document.getElementById('staff-login-code').value = code;
+        }
+
+        function logoutUser() {
+            currentSession = null;
+            updateUIAfterLogin();
+            goHome();
+        }
+
+        function updateUIAfterLogin() {
+            const nav = document.getElementById('header-nav');
+            const dashboardSection = document.getElementById('ticket-dashboard-section');
+
+            if (!currentSession) {
+                nav.innerHTML = `<button class="btn btn-secondary" onclick="openModal('player')">Login</button>`;
+                dashboardSection.classList.add('hidden');
+            } else {
+                let staffControlsHtml = '';
+                if (currentSession.isStaff) {
+                    staffControlsHtml = `
+                        <div class="staff-panel-wrapper">
+                            <button class="btn" onclick="toggleStaffPanel()" style="background:#7b2cbf;">Staff Panel ⚙️</button>
+                            <div id="staff-dropdown-frame" class="staff-dropdown-frame hidden">
+                                <h3>Staff Control Panel</h3>
+                                
+                                <div style="margin-bottom: 14px;">
+                                    <label style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Look up API Key / Code</label>
+                                    <div style="display: flex; gap: 6px;">
+                                        <input type="text" id="staff-lookup-code" placeholder="Enter API Code..." style="flex:1; padding: 8px; background: #0d0a14; border: 1px solid var(--border-clr); border-radius: 6px; color: white; font-size: 0.8rem; text-transform: uppercase;">
+                                        <button class="btn" style="padding: 8px 12px; font-size: 0.75rem;" onclick="lookupApiKey()">Lookup</button>
+                                    </div>
+                                    <div id="lookup-result" style="font-size: 0.75rem; color: #c77dff; margin-top: 6px;"></div>
+                                </div>
+
+                                <div style="margin-bottom: 14px; border-top: 1px solid var(--border-clr); padding-top: 12px;">
+                                    <label style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Admin: Open Ticket for Player</label>
+                                    <input type="text" id="admin-target-code" placeholder="Player API Code" style="width: 100%; padding: 8px; background: #0d0a14; border: 1px solid var(--border-clr); border-radius: 6px; color: white; font-size: 0.8rem; margin-bottom: 6px; text-transform: uppercase;">
+                                    <select id="admin-ticket-cat" style="width: 100%; padding: 8px; background: #0d0a14; border: 1px solid var(--border-clr); border-radius: 6px; color: white; font-size: 0.8rem; margin-bottom: 8px;">
+                                        <option value="General Support">General Support</option>
+                                        <option value="Purchase support">Purchase support</option>
+                                        <option value="Bug support">Bug support</option>
+                                        <option value="Media application">Media application</option>
+                                        <option value="Ban appeal">Ban appeal</option>
+                                        <option value="Player report">Player report</option>
+                                    </select>
+                                    <button class="btn" style="width: 100%; padding: 8px; font-size: 0.78rem;" onclick="adminOpenTicket()">Create & Open Ticket</button>
+                                </div>
+
+                                <div style="border-top: 1px solid var(--border-clr); padding-top: 12px;">
+                                    <label style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 6px;">Account Database (Profiles & Passwords)</label>
+                                    <div style="max-height: 140px; overflow-y: auto;">
+                                        <table class="staff-db-table" id="staff-database-table">
+                                            <tr><th>User / Code</th><th>Details / Pass</th></tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                nav.innerHTML = `
+                    ${staffControlsHtml}
+                    <button class="btn btn-secondary" onclick="goProfile()" style="padding: 6px 14px; font-size:0.8rem;">Profile</button>
+                    <button class="btn btn-danger" onclick="logoutUser()" style="padding: 6px 14px; font-size:0.8rem;">Log Out</button>
+                `;
+                dashboardSection.classList.remove('hidden');
+                renderTicketsDashboard();
+            }
+        }
+
+        function toggleStaffPanel() {
+            const panel = document.getElementById('staff-dropdown-frame');
+            panel.classList.toggle('hidden');
+            if (!panel.classList.contains('hidden')) {
+                renderStaffDatabaseTable();
+            }
+        }
+
+        function lookupApiKey() {
+            const code = document.getElementById('staff-lookup-code').value.trim().toUpperCase();
+            const resBox = document.getElementById('lookup-result');
+            if (!code) {
+                resBox.innerText = "Please enter a code to lookup.";
+                return;
+            }
+
+            let profile = localStorage.getItem('dupesmp_profile_' + code);
+            let staffDb = JSON.parse(localStorage.getItem('dupesmp_staff_db')) || {};
+            let isStaffMatch = "No";
+            for(let name in staffDb) {
+                if(staffDb[name].code === code) isStaffMatch = "Yes (" + name + ")";
+            }
+
+            if (profile || isStaffMatch !== "No") {
+                let pData = profile ? JSON.parse(profile) : { ign: "Staff Account", platform: "N/A", yt: "None", twitch: "None", tiktok: "None" };
+                resBox.innerHTML = `Found! IGN/User: <b>${pData.ign}</b><br>` +
+                                   `Platform: <b>${pData.platform || 'N/A'}</b> | Staff: <b>${isStaffMatch}</b><br>` +
+                                   `YouTube: <a href="${pData.yt || '#'}" target="_blank" style="color:#c77dff;">${pData.yt || 'None'}</a><br>` +
+                                   `Twitch: <a href="${pData.twitch || '#'}" target="_blank" style="color:#c77dff;">${pData.twitch || 'None'}</a><br>` +
+                                   `TikTok: <a href="${pData.tiktok || '#'}" target="_blank" style="color:#c77dff;">${pData.tiktok || 'None'}</a>`;
+            } else {
+                resBox.innerText = "No records found for code: " + code;
+            }
+        }
+
+        function adminOpenTicket() {
+            const code = document.getElementById('admin-target-code').value.trim().toUpperCase();
+            const category = document.getElementById('admin-ticket-cat').value;
+
+            if (!code || code.length !== 8) {
+                alert("Please enter a valid 8-character player API code.");
+                return;
+            }
+
+            let profileData = JSON.parse(localStorage.getItem('dupesmp_profile_' + code)) || { ign: "Player_" + code, platform: "Java", version: "1.21.11" };
+
+            let initialMessages = [
+                { sender: "DupeSMP Bot", text: `Welcome to DupeSMP Support! Ticket opened under category: ${category}. Provide your username and platform to get the conversation started.` }
+            ];
+
+            const newTicket = {
+                id: ticketsDatabase.length + 1,
+                code: code,
+                ign: profileData.ign,
+                category: category,
+                status: "Open",
+                unreadCounts: { player: 0, staff: 0 },
+                messages: initialMessages
+            };
+
+            ticketsDatabase.push(newTicket);
+            localStorage.setItem('dupesmp_tickets_db', JSON.stringify(ticketsDatabase));
+
+            alert(`Ticket #${newTicket.id} successfully created for ${profileData.ign} under ${category}!`);
+            toggleStaffPanel();
+            renderTicketsDashboard();
+        }
+
+        function renderStaffDatabaseTable() {
+            const table = document.getElementById('staff-database-table');
+            table.innerHTML = `<tr><th>User / Code</th><th>Details / Pass</th></tr>`;
+
+            let staffDb = JSON.parse(localStorage.getItem('dupesmp_staff_db')) || {};
+            for (let name in staffDb) {
+                table.innerHTML += `<tr><td>${name} (Staff)</td><td>Code: ${staffDb[name].code} | Pass: ${staffDb[name].pass}</td></tr>`;
+            }
+
+            for (let i = 0; i < localStorage.length; i++) {
+                let key = localStorage.key(i);
+                if (key.startsWith('dupesmp_profile_')) {
+                    let code = key.replace('dupesmp_profile_', '');
+                    let p = JSON.parse(localStorage.getItem(key));
+                    table.innerHTML += `<tr><td>Code: ${code}</td><td>IGN: ${p.ign} | YT: ${p.yt ? 'Linked' : 'None'}</td></tr>`;
+                }
+            }
+        }
+
+        function setPlatform(plat) {
+            selectedPlatform = plat;
+            ['Java', 'Bedrock', 'Both'].forEach(p => {
+                document.getElementById('p-' + p.toLowerCase()).classList.remove('active');
+            });
+            document.getElementById('p-' + plat.toLowerCase()).classList.add('active');
+        }
+
+        function autoFillProfileSettings() {
+            const mockIGNs = ["DupeKing99", "ShadowPvP", "CraftMaster", "VoidWalker", "DiamondMiner"];
+            const randomIGN = currentSession.isStaff ? currentSession.name : mockIGNs[Math.floor(Math.random() * mockIGNs.length)];
+            const platforms = ["Java", "Bedrock", "Both"];
+            const randomPlatform = platforms[Math.floor(Math.random() * platforms.length)];
+
+            document.getElementById('prof-ign').value = randomIGN;
+            document.getElementById('prof-disc').value = "dupegod_" + currentSession.identifier.toLowerCase();
+            document.getElementById('prof-version').value = "1.21.11";
+            document.getElementById('prof-yt').value = "https://youtube.com/@" + randomIGN.toLowerCase();
+            document.getElementById('prof-twitch').value = "https://twitch.tv/" + randomIGN.toLowerCase();
+            document.getElementById('prof-tiktok').value = "https://tiktok.com/@" + randomIGN.toLowerCase();
+            setPlatform(randomPlatform);
+            
+            alert("Profile settings auto-filled successfully!");
+        }
+
+        function saveProfile() {
+            const ign = document.getElementById('prof-ign').value.trim();
+            const disc = document.getElementById('prof-disc').value.trim();
+            const version = document.getElementById('prof-version').value.trim();
+            const yt = document.getElementById('prof-yt').value.trim();
+            const twitch = document.getElementById('prof-twitch').value.trim();
+            const tiktok = document.getElementById('prof-tiktok').value.trim();
+
+            if (!ign) return alert("Please enter your Minecraft IGN.");
+
+            let profileData = { ign: ign, disc: disc, version: version, platform: selectedPlatform, yt: yt, twitch: twitch, tiktok: tiktok };
+            localStorage.setItem('dupesmp_profile_' + currentSession.identifier, JSON.stringify(profileData));
+            alert("Profile saved successfully!");
+            goHome();
+        }
+
+        function createNewTicket(category) {
+            if (!currentSession) {
+                alert("Please log in first.");
+                openModal('player');
+                return;
+            }
+
+            let profileData = JSON.parse(localStorage.getItem('dupesmp_profile_' + currentSession.identifier)) || { ign: currentSession.isStaff ? currentSession.name : "Player", platform: "Java", version: "1.21.11" };
+            
+            let initialMessages = [
+                { sender: "DupeSMP Bot", text: `Welcome to DupeSMP Support! Ticket opened under category: ${category}. Provide your username and platform to get the conversation started.` }
+            ];
+
+            const newTicket = {
+                id: ticketsDatabase.length + 1,
+                code: currentSession.identifier,
+                ign: profileData.ign,
+                category: category,
+                status: "Open",
+                unreadCounts: { player: 0, staff: 0 },
+                messages: initialMessages
+            };
+
+            ticketsDatabase.push(newTicket);
+            localStorage.setItem('dupesmp_tickets_db', JSON.stringify(ticketsDatabase));
+            
+            openChatView(newTicket.id);
+        }
+
+        function renderTicketsDashboard() {
+            const openedContainer = document.getElementById('opened-tickets-container');
+            const closedContainer = document.getElementById('closed-tickets-container');
+            
+            openedContainer.innerHTML = "";
+            closedContainer.innerHTML = "";
+
+            const visibleTickets = ticketsDatabase.filter(t => currentSession.isStaff || t.code === currentSession.identifier);
+
+            const openList = visibleTickets.filter(t => t.status === "Open");
+            const closedList = visibleTickets.filter(t => t.status === "Closed");
+
+            if (openList.length === 0) {
+                openedContainer.innerHTML = `<p style="color:var(--text-muted); font-size:0.85rem; padding:10px 0;">No active opened tickets.</p>`;
+            } else {
+                openList.forEach(t => {
+                    let unreadCount = currentSession.isStaff ? (t.unreadCounts ? t.unreadCounts.staff : 0) : (t.unreadCounts ? t.unreadCounts.player : 0);
+                    let badgeHtml = unreadCount > 0 ? `<span class="unread-badge">${unreadCount}</span>` : '';
+
+                    openedContainer.innerHTML += `
+                        <div class="ticket-list-item">
+                            <div>
+                                <strong>#${t.id} - ${t.category}</strong> <span style="color:var(--text-muted); font-size:0.8rem;">(IGN: ${t.ign})</span>
+                                ${badgeHtml}
+                                <p style="font-size:0.8rem; color:#d8d0ef; margin-top:2px;">Status: Active Support Chat</p>
+                            </div>
+                            <button class="btn" style="padding:6px 14px; font-size:0.8rem;" onclick="openChatView(${t.id})">Open Chat</button>
+                        </div>
+                    `;
+                });
+            }
+
+            if (closedList.length === 0) {
+                closedContainer.innerHTML = `<p style="color:var(--text-muted); font-size:0.85rem; padding:10px 0;">No recent or closed tickets.</p>`;
+            } else {
+                closedList.forEach(t => {
+                    closedContainer.innerHTML += `
+                        <div class="ticket-list-item" style="opacity: 0.7;">
+                            <div>
+                                <strong>#${t.id} - ${t.category}</strong> <span style="color:var(--text-muted); font-size:0.8rem;">(IGN: ${t.ign})</span>
+                                <p style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Status: Closed / Resolved</p>
+                            </div>
+                            <button class="btn btn-secondary" style="padding:6px 14px; font-size:0.8rem;" onclick="openChatView(${t.id})">View History</button>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        function openChatView(ticketId) {
+            activeTicketId = ticketId;
+            let ticket = ticketsDatabase.find(t => t.id === activeTicketId);
+            if (ticket && ticket.unreadCounts) {
+                if (currentSession.isStaff) {
+                    ticket.unreadCounts.staff = 0;
+                } else {
+                    ticket.unreadCounts.player = 0;
+                }
+                localStorage.setItem('dupesmp_tickets_db', JSON.stringify(ticketsDatabase));
+            }
+
+            hideAllViews();
+            document.getElementById('view-chat').classList.remove('hidden');
+            renderChatMessages();
+            renderPlayerQuickRepliesBar();
+        }
+
+        function renderPlayerQuickRepliesBar() {
+            const ticket = ticketsDatabase.find(t => t.id === activeTicketId);
+            const qrBar = document.getElementById('quick-replies-bar');
+            qrBar.innerHTML = "";
+            if (!ticket || ticket.status === "Closed") return;
+
+            let profileData = JSON.parse(localStorage.getItem('dupesmp_profile_' + currentSession.identifier)) || { ign: currentSession.isStaff ? currentSession.name : "Player", platform: "Java", version: "1.21.11" };
+
+            qrBar.innerHTML += `<button class="qr-btn" onclick="sendPlayerQuickReply('My username is ${profileData.ign} and my platform is ${profileData.platform || 'Java'}.')">1. Provide username & platform</button>`;
+            qrBar.innerHTML += `<button class="qr-btn" onclick="sendPlayerQuickReply('I am on version ${profileData.version || '1.21.11'}.')">2. What version are you on?</button>`;
+
+            if (ticket.category === "General Support" || ticket.category === "Bug support" || ticket.category === "Player report") {
+                qrBar.innerHTML += `<button class="qr-btn" onclick="fillInputBox('Medal clip: Your medal clip link here!')">3. Send Clip (Medal)</button>`;
+                qrBar.innerHTML += `<button class="qr-btn" onclick="sendPlayerQuickReply('I don't have one')">I don't have one</button>`;
+            } else if (ticket.category === "Purchase support") {
+                qrBar.innerHTML += `<button class="qr-btn" onclick="sendPlayerQuickReply('Here is my receipt code: TEBEX-123456')">3. Provide Receipt</button>`;
+                qrBar.innerHTML += `<button class="qr-btn" onclick="sendPlayerQuickReply('I dont have a receipt')">I dont have one</button>`;
+            } else if (ticket.category === "Media application") {
+                qrBar.innerHTML += `<button class="qr-btn" onclick="fillInputBox('Medal clip: Your medal clip link here!')">3. Send Analytics Clip</button>`;
+            } else if (ticket.category === "Ban appeal") {
+                qrBar.innerHTML += `<button class="qr-btn" onclick="sendPlayerQuickReply('Ban reason: Lag, ban time: 1 day, date: today. I don\'t have a clip.')">3. Ban details & clip info</button>`;
+            }
+        }
+
+        function fillInputBox(text) {
+            const inputField = document.getElementById('chat-message-input');
+            inputField.value = text;
+            inputField.focus();
+        }
+
+        function incrementUnread(ticket, senderType) {
+            if (!ticket.unreadCounts) ticket.unreadCounts = { player: 0, staff: 0 };
+            const isViewingChat = activeTicketId === ticket.id && !document.getElementById('view-chat').classList.contains('hidden');
+            
+            if (!isViewingChat) {
+                if (senderType === 'staff') {
+                    ticket.unreadCounts.player += 1;
+                } else {
+                    ticket.unreadCounts.staff += 1;
+                }
+            }
+        }
+
+        function sendPlayerQuickReply(text) {
+            const ticket = ticketsDatabase.find(t => t.id === activeTicketId);
+            if (!ticket || ticket.status === "Closed") return;
+
+            let profileData = JSON.parse(localStorage.getItem('dupesmp_profile_' + currentSession.identifier)) || { ign: ticket.ign };
+            
+            ticket.messages.push({ sender: profileData.ign, text: text });
+            incrementUnread(ticket, 'player');
+
+            setTimeout(() => {
+                let botReply = "";
+                let textLower = text.toLowerCase();
+
+                if (textLower.includes("username") || textLower.includes("platform")) {
+                    botReply = `What version are you on? Exp. ${profileData.version || '1.21.11'}`;
+                } else if (textLower.includes("version")) {
+                    if (ticket.category === "General Support" || ticket.category === "Bug support") {
+                        botReply = `What are you experiencing? If you do have a clip please send it to us for evidence to fix the bug.`;
+                    } else if (ticket.category === "Purchase support") {
+                        botReply = `Please make sure that you provide your ticket receipt so our staff can verify your order! Dont have a recipt say "I dont have one"! Please note having your tebex recipt code will help speed up the process!`;
+                    } else if (ticket.category === "Media application") {
+                        botReply = `Hello! To verify your application status, please send a clip via medal to us of you youtube analitics! remeber your quota! 5 avg. viewers on a stream and 850 viewers on a longform video or 1k on a shortform`;
+                    } else if (ticket.category === "Ban appeal") {
+                        botReply = `Please descibe why you got banned. make sure you include the bantime, ban reason, date you got banned, and ensure you have a clip. (dont have a clip make sure to say somewhere in your tesxt i dont have a clip.)`;
+                    } else if (ticket.category === "Player report") {
+                        botReply = `Please state the user of the player your reporting and if you have a clip please send it to shorten the procsess!`;
+                    }
+                } else if (textLower.includes("https://medal.tv") || textLower.includes("medal.tv") || textLower.includes("medal clip:")) {
+                    if (ticket.category === "Media application") {
+                        botReply = `after clip please be patiant while out staff handles this! you will get a responce soon!`;
+                    } else {
+                        botReply = `Thanks for the clip ${profileData.ign}! We will getour staff here shortly.`;
+                    }
+                } else if (textLower.includes("i don't have one") || textLower.includes("i dont have one")) {
+                    if (ticket.category === "General Support" || ticket.category === "Bug support") {
+                        botReply = `The clip is invalid, please send a valid clip! No clip then say I dont have one. Thanks for the clip ${profileData.ign}! We will getour staff here shortly.`;
+                    } else {
+                        botReply = `Thanks for sharing that with us! We will get staff on your way.`;
+                    }
+                } else if (ticket.category === "Purchase support" && (textLower.includes("receipt") || textLower.includes("tebex"))) {
+                    botReply = `Thanks for sharing that with us! We will get staff on your way.`;
+                } else if (ticket.category === "Ban appeal") {
+                    botReply = `a staff will be with you soon!`;
+                } else if (ticket.category === "Player report") {
+                    botReply = `tThanks for the report wwe will contact the staff shrotly`;
+                } else {
+                    if (ticket.category === "General Support") {
+                        botReply = `Thanks for detailing your experience! Staff will be with you shortly.`;
+                    }
+                }
+
+                if (botReply) {
+                    ticket.messages.push({ sender: "DupeSMP Bot", text: botReply });
+                    incrementUnread(ticket, 'staff');
+                    localStorage.setItem('dupesmp_tickets_db', JSON.stringify(ticketsDatabase));
+                    renderChatMessages();
+                }
+            }, 500);
+
+            localStorage.setItem('dupesmp_tickets_db', JSON.stringify(ticketsDatabase));
+            renderChatMessages();
+        }
+
+        function renderChatMessages() {
+            const ticket = ticketsDatabase.find(t => t.id === activeTicketId);
+            if (!ticket) return;
+
+            document.getElementById('chat-header-title').innerText = `#${ticket.id} - ${ticket.category} (${ticket.ign})`;
+            document.getElementById('chat-header-status').innerText = `Status: ${ticket.status}`;
+            
+            const closeBtn = document.getElementById('close-ticket-btn');
+            const inputRow = document.getElementById('chat-input-row');
+            const qrBar = document.getElementById('quick-replies-bar');
+
+            if (ticket.status === "Closed") {
+                closeBtn.innerText = "Reopen Ticket";
+                closeBtn.className = "btn";
+                inputRow.style.display = "none";
+                qrBar.style.display = "none";
+            } else {
+                closeBtn.innerText = "Close Ticket";
+                closeBtn.className = "btn btn-danger";
+                inputRow.style.display = "flex";
+                qrBar.style.display = "flex";
+            }
+
+            const msgBox = document.getElementById('chat-messages-box');
+            msgBox.innerHTML = "";
+
+            ticket.messages.forEach(m => {
+                let msgClass = "user";
+                let displayName = m.sender;
+
+                if (m.sender === "DupeSMP Bot") {
+                    msgClass = "bot";
+                } else if (allowedStaffNames.includes(m.sender.toUpperCase()) || m.sender === "Zanecpvp") {
+                    msgClass = "admin";
+                    displayName = m.sender;
+                } else {
+                    displayName = ticket.ign;
+                }
+                
+                msgBox.innerHTML += `
+                    <div class="chat-msg ${msgClass}">
+                        <div style="font-size:0.7rem; color:var(--text-muted); margin-bottom:2.5px; font-weight:600;">${displayName}</div>
+                        <div>${m.text}</div>
+                    </div>
+                `;
+            });
+            msgBox.scrollTop = msgBox.scrollHeight;
+        }
+
+        function sendChatMessage() {
+            const textInput = document.getElementById('chat-message-input');
+            const text = textInput.value.trim();
+            if (!text) return;
+
+            const ticket = ticketsDatabase.find(t => t.id === activeTicketId);
+            if (!ticket || ticket.status === "Closed") return;
+
+            let profileData = JSON.parse(localStorage.getItem('dupesmp_profile_' + currentSession.identifier)) || { ign: currentSession.name };
+            const senderLabel = currentSession.isStaff ? currentSession.name : profileData.ign;
+
+            ticket.messages.push({ sender: senderLabel, text: text });
+            
+            if (currentSession.isStaff) {
+                incrementUnread(ticket, 'staff');
+            } else {
+                incrementUnread(ticket, 'player');
+            }
+
+            setTimeout(() => {
+                let botFollowUp = "";
+                let textLower = text.toLowerCase();
+
+                if (!currentSession.isStaff) {
+                    if (ticket.category === "General Support") {
+                        botFollowUp = `Thanks for detailing your experience! Staff will be with you shortly.`;
+                    } else if (ticket.category === "Bug support" || ticket.category === "Player report") {
+                        if (textLower.includes("medal clip:")) {
+                            botFollowUp = `Thanks for the clip ${profileData.ign}! We will getour staff here shortly.`;
+                        }
+                    }
+                }
+
+                if (botFollowUp) {
+                    ticket.messages.push({ sender: "DupeSMP Bot", text: botFollowUp });
+                    incrementUnread(ticket, 'staff');
+                    localStorage.setItem('dupesmp_tickets_db', JSON.stringify(ticketsDatabase));
+                    renderChatMessages();
+                }
+            }, 500);
+
+            localStorage.setItem('dupesmp_tickets_db', JSON.stringify(ticketsDatabase));
+            textInput.value = "";
+            renderChatMessages();
+            renderPlayerQuickRepliesBar();
+        }
+
+        function toggleCloseTicket() {
+            const ticket = ticketsDatabase.find(t => t.id === activeTicketId);
+            if (!ticket) return;
+
+            ticket.status = ticket.status === "Open" ? "Closed" : "Open";
+            localStorage.setItem('dupesmp_tickets_db', JSON.stringify(ticketsDatabase));
+            renderChatMessages();
+            renderPlayerQuickRepliesBar();
+        }
+
+        function goHome() {
+            hideAllViews();
+            document.getElementById('view-home').classList.remove('hidden');
+            if (currentSession) renderTicketsDashboard();
+        }
+
+        function goProfile() {
+            hideAllViews();
+            document.getElementById('view-profile').classList.remove('hidden');
+            document.getElementById('prof-code').value = currentSession.identifier;
+            
+            let profileData = JSON.parse(localStorage.getItem('dupesmp_profile_' + currentSession.identifier));
+            if (profileData) {
+                document.getElementById('prof-ign').value = profileData.ign || "";
+                document.getElementById('prof-disc').value = profileData.disc || "";
+                document.getElementById('prof-version').value = profileData.version || "1.21.11";
+                document.getElementById('prof-yt').value = profileData.yt || "";
+                document.getElementById('prof-twitch').value = profileData.twitch || "";
+                document.getElementById('prof-tiktok').value = profileData.tiktok || "";
+                if (profileData.platform) setPlatform(profileData.platform);
+            } else {
+                document.getElementById('prof-ign').value = currentSession.isStaff ? currentSession.name : "";
+                document.getElementById('prof-disc').value = "";
+                document.getElementById('prof-version').value = "1.21.11";
+                document.getElementById('prof-yt').value = "";
+                document.getElementById('prof-twitch').value = "";
+                document.getElementById('prof-tiktok').value = "";
+                setPlatform("Java");
+            }
+        }
+
+        function hideAllViews() {
+            document.getElementById('view-home').classList.add('hidden');
+            document.getElementById('view-profile').classList.add('hidden');
+            document.getElementById('view-chat').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
