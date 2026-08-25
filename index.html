@@ -678,7 +678,7 @@
                     <h3 style="font-size: 1.05rem; margin-bottom: 4px;">Staff Signup</h3>
                     <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px;">Authorized MC Name: Clockwrx, Zanecpvp, Prolegoboy, swordgodd</p>
                     <label style="font-size: 0.72rem; color: var(--text-muted);">Minecraft Username</label>
-                    <input type="text" id="staff-reg-user" placeholder="Clockwrx / Zanecpvp / Prolegoboy / swordgodd">
+                    <input type="text" id="staff-reg-user" placeholder="Username or UUID here">
                     <label style="font-size: 0.72rem; color: var(--text-muted);">Staff API Code</label>
                     <input type="text" id="staff-reg-code" placeholder="8-char API code" maxlength="8" style="text-transform: uppercase;">
                     <label style="font-size: 0.72rem; color: var(--text-muted);">Password</label>
@@ -814,7 +814,7 @@
             }
 
             if (!allowedStaffNames.includes(username.toUpperCase())) {
-                return alert("Registration Failed: Only Clockwrx, Zanecpvp, Prolegoboy, or swordgodd can hold staff accounts.");
+                return alert("Registration Failed: Only admins can hold staff accounts.");
             }
 
             db.ref('staff/' + username.toUpperCase()).set({ code: code, pass: pass }, (error) => {
