@@ -659,31 +659,43 @@
             </div>
 
             <div id="pane-staff" class="hidden">
-                <div style="display: flex; gap: 5px; margin-bottom: 12px;">
-                    <button class="btn btn-secondary" id="staff-subtab-in" style="flex:1; font-size:0.75rem; padding:6px;" onclick="switchStaffSub('in')">Staff Login</button>
-                    <button class="btn btn-secondary" id="staff-subtab-up" style="flex:1; font-size:0.75rem; padding:6px;" onclick="switchStaffSub('up')">Staff Signup</button>
+                <!-- Staff Portal PIN Gate -->
+                <div id="staff-portal-gate">
+                    <h3 style="font-size: 1.1rem; margin-bottom: 6px;">Staff Portal Security</h3>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Enter the 4-digit staff portal access PIN to proceed. (Default: <code>1234</code>)</p>
+                    <label style="font-size: 0.75rem; color: var(--text-muted);">Portal Access PIN</label>
+                    <input type="password" id="staff-portal-pin" placeholder="••••" maxlength="4" inputmode="numeric" style="letter-spacing: 4px; text-align: center; font-weight: bold;">
+                    <button class="btn" style="width: 100%;" onclick="verifyStaffPortalPin()">Unlock Portal</button>
                 </div>
 
-                <div id="staff-pane-in">
-                    <h3 style="font-size: 1.05rem; margin-bottom: 4px;">Staff Login</h3>
-                    <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px;">Restricted to approved staff members.</p>
-                    <label style="font-size: 0.72rem; color: var(--text-muted);">Staff API Code</label>
-                    <input type="text" id="staff-login-code" placeholder="8-char API code" maxlength="8" style="text-transform: uppercase;">
-                    <label style="font-size: 0.72rem; color: var(--text-muted);">Password</label>
-                    <input type="password" id="staff-login-pass" placeholder="••••••••">
-                    <button class="btn" style="width: 100%;" onclick="submitStaffLogin()">Staff Sign In</button>
-                </div>
+                <!-- Staff Login & Signup Container (Unlocked After PIN) -->
+                <div id="staff-portal-content" class="hidden">
+                    <div style="display: flex; gap: 5px; margin-bottom: 12px;">
+                        <button class="btn btn-secondary" id="staff-subtab-in" style="flex:1; font-size:0.75rem; padding:6px;" onclick="switchStaffSub('in')">Staff Login</button>
+                        <button class="btn btn-secondary" id="staff-subtab-up" style="flex:1; font-size:0.75rem; padding:6px;" onclick="switchStaffSub('up')">Staff Signup</button>
+                    </div>
 
-                <div id="staff-pane-up" class="hidden">
-                    <h3 style="font-size: 1.05rem; margin-bottom: 4px;">Staff Signup</h3>
-                    <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px;">Authorized MC Name: Staff user or UUID</p>
-                    <label style="font-size: 0.72rem; color: var(--text-muted);">Minecraft Username</label>
-                    <input type="text" id="staff-reg-user" placeholder="Username or UUID here">
-                    <label style="font-size: 0.72rem; color: var(--text-muted);">Staff API Code</label>
-                    <input type="text" id="staff-reg-code" placeholder="8-char API code" maxlength="8" style="text-transform: uppercase;">
-                    <label style="font-size: 0.72rem; color: var(--text-muted);">Password</label>
-                    <input type="password" id="staff-reg-pass" placeholder="••••••••">
-                    <button class="btn" style="width: 100%;" onclick="submitStaffRegister()">Create Staff Account</button>
+                    <div id="staff-pane-in">
+                        <h3 style="font-size: 1.05rem; margin-bottom: 4px;">Staff Login</h3>
+                        <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px;">Restricted to approved staff members.</p>
+                        <label style="font-size: 0.72rem; color: var(--text-muted);">Staff API Code</label>
+                        <input type="text" id="staff-login-code" placeholder="8-char API code" maxlength="8" style="text-transform: uppercase;">
+                        <label style="font-size: 0.72rem; color: var(--text-muted);">Account PIN</label>
+                        <input type="password" id="staff-login-pin" placeholder="••••" maxlength="4" inputmode="numeric" style="letter-spacing: 4px; text-align: center; font-weight: bold;">
+                        <button class="btn" style="width: 100%;" onclick="submitStaffLogin()">Staff Sign In</button>
+                    </div>
+
+                    <div id="staff-pane-up" class="hidden">
+                        <h3 style="font-size: 1.05rem; margin-bottom: 4px;">Staff Signup</h3>
+                        <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px;">Authorized: Clockwrx, Zanecpvp, Prolegoboy, swordgodd</p>
+                        <label style="font-size: 0.72rem; color: var(--text-muted);">Minecraft Username</label>
+                        <input type="text" id="staff-reg-user" placeholder="Enter username...">
+                        <label style="font-size: 0.72rem; color: var(--text-muted);">Staff API Code</label>
+                        <input type="text" id="staff-reg-code" placeholder="8-char API code" maxlength="8" style="text-transform: uppercase;">
+                        <label style="font-size: 0.72rem; color: var(--text-muted);">Create Account PIN (4 Digits)</label>
+                        <input type="password" id="staff-reg-pin" placeholder="••••" maxlength="4" inputmode="numeric" style="letter-spacing: 4px; text-align: center; font-weight: bold;">
+                        <button class="btn" style="width: 100%;" onclick="submitStaffRegister()">Create Staff Account</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -705,6 +717,7 @@
         const db = firebase.database();
 
         const allowedStaffNames = ["CLOCKWRX", "ZANECPVP", "PROLEGOBOY", "SWORDGODD"];
+        const STAFF_PORTAL_PIN = "4456"; // Master PIN to unlock the staff portal screens
 
         let currentSession = null; 
         let selectedPlatform = "Java";
@@ -730,8 +743,6 @@
 
         db.ref('staff').on('value', (snapshot) => {
             staffDatabase = snapshot.val() || {};
-        }, (error) => {
-            console.error("Firebase read error:", error);
         });
 
         function openModal(mode) {
@@ -742,7 +753,13 @@
                 switchAuthMode('player');
             }
         }
-        function closeModal() { document.getElementById('auth-modal').classList.remove('active'); }
+        function closeModal() { 
+            document.getElementById('auth-modal').classList.remove('active');
+            // Reset portal gate when closing
+            document.getElementById('staff-portal-gate').classList.remove('hidden');
+            document.getElementById('staff-portal-content').classList.add('hidden');
+            document.getElementById('staff-portal-pin').value = "";
+        }
 
         function switchAuthMode(mode) {
             if(mode === 'player') {
@@ -755,8 +772,24 @@
                 document.getElementById('tab-player').classList.remove('active');
                 document.getElementById('pane-staff').classList.remove('hidden');
                 document.getElementById('pane-player').classList.add('hidden');
-                switchStaffSub('in');
+                
+                // Reset to lock gate every time staff tab is clicked
+                document.getElementById('staff-portal-gate').classList.remove('hidden');
+                document.getElementById('staff-portal-content').classList.add('hidden');
+                document.getElementById('staff-portal-pin').value = "";
             }
+        }
+
+        function verifyStaffPortalPin() {
+            const enteredPin = document.getElementById('staff-portal-pin').value.trim();
+            if (enteredPin !== STAFF_PORTAL_PIN) {
+                return alert("Incorrect Staff Portal PIN!");
+            }
+
+            // Hide gate and show staff login/signup screens
+            document.getElementById('staff-portal-gate').classList.add('hidden');
+            document.getElementById('staff-portal-content').classList.remove('hidden');
+            switchStaffSub('in');
         }
 
         function switchStaffSub(sub) {
@@ -784,19 +817,21 @@
 
         function submitStaffLogin() {
             const code = document.getElementById('staff-login-code').value.trim().toUpperCase();
-            const pass = document.getElementById('staff-login-pass').value.trim();
-            if (!code || code.length !== 8 || !pass) return alert("Please provide a valid 8-character API code and password.");
+            const pin = document.getElementById('staff-login-pin').value.trim();
+            if (!code || code.length !== 8 || !pin || pin.length !== 4) {
+                return alert("Please provide your 8-character API code and a valid 4-digit PIN.");
+            }
 
             let foundStaffName = null;
             for (let name in staffDatabase) {
-                if (staffDatabase[name].code === code && staffDatabase[name].pass === pass) {
+                if (staffDatabase[name].code === code && staffDatabase[name].pin === pin) {
                     foundStaffName = name;
                     break;
                 }
             }
 
             if (!foundStaffName) {
-                return alert("Invalid staff API code or password. Make sure you signed up first.");
+                return alert("Invalid staff API code or account PIN.");
             }
 
             currentSession = { identifier: code, name: foundStaffName, isStaff: true };
@@ -807,21 +842,21 @@
         function submitStaffRegister() {
             const username = document.getElementById('staff-reg-user').value.trim();
             const code = document.getElementById('staff-reg-code').value.trim().toUpperCase();
-            const pass = document.getElementById('staff-reg-pass').value.trim();
+            const pin = document.getElementById('staff-reg-pin').value.trim();
             
-            if (!username || !code || code.length !== 8 || !pass) {
-                return alert("Please fill out all fields correctly (Code must be 8 characters).");
+            if (!username || !code || code.length !== 8 || !pin || pin.length !== 4 || isNaN(pin)) {
+                return alert("Please fill out all fields correctly (Code must be 8 chars, PIN must be exactly 4 numbers).");
             }
 
             if (!allowedStaffNames.includes(username.toUpperCase())) {
-                return alert("Registration Failed: Only admins can hold staff accounts.");
+                return alert("Registration Failed: Only Clockwrx, Zanecpvp, Prolegoboy, or swordgodd can hold staff accounts.");
             }
 
-            db.ref('staff/' + username.toUpperCase()).set({ code: code, pass: pass }, (error) => {
+            db.ref('staff/' + username.toUpperCase()).set({ code: code, pin: pin }, (error) => {
                 if (error) {
-                    alert("Firebase Permission Error: " + error.message + "\n\nMake sure your Firebase Realtime Database rules are set to .read: true and .write: true!");
+                    alert("Registration failed: " + error.message);
                 } else {
-                    alert("Staff account created successfully! You can now sign in using your API code.");
+                    alert("Staff account created successfully!");
                     switchStaffSub('in');
                     document.getElementById('staff-login-code').value = code;
                 }
@@ -874,10 +909,10 @@
                                 </div>
 
                                 <div style="border-top: 1px solid var(--border-clr); padding-top: 12px;">
-                                    <label style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 6px;">Account Database (Profiles & Passwords)</label>
+                                    <label style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 6px;">Account Database (Profiles & PINs)</label>
                                     <div style="max-height: 140px; overflow-y: auto;">
                                         <table class="staff-db-table" id="staff-database-table">
-                                            <tr><th>User / Code</th><th>Details / Pass</th></tr>
+                                            <tr><th>User / Code</th><th>Details / PIN</th></tr>
                                         </table>
                                     </div>
                                 </div>
@@ -974,10 +1009,10 @@
 
         function renderStaffDatabaseTable() {
             const table = document.getElementById('staff-database-table');
-            table.innerHTML = `<tr><th>User / Code</th><th>Details / Pass</th></tr>`;
+            table.innerHTML = `<tr><th>User / Code</th><th>Details / PIN</th></tr>`;
 
             for (let name in staffDatabase) {
-                table.innerHTML += `<tr><td>${name} (Staff)</td><td>Code: ${staffDatabase[name].code} | Pass: ${staffDatabase[name].pass}</td></tr>`;
+                table.innerHTML += `<tr><td>${name} (Staff)</td><td>Code: ${staffDatabase[name].code} | PIN: ${staffDatabase[name].pin}</td></tr>`;
             }
 
             for (let code in profilesDatabase) {
