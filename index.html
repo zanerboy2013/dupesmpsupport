@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DupeSMP | Support Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDKs for Global Cloud Persistence on GitHub Pages -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
     <style>
         :root {
             --bg-dark: #0d0a14;
@@ -442,18 +447,6 @@
 </head>
 <body>
 
-    <script>
-        // Clean wipe of all previous stored session data on load
-        localStorage.removeItem('dupesmp_tickets_db');
-        localStorage.removeItem('dupesmp_staff_db');
-        for (let i = localStorage.length - 1; i >= 0; i--) {
-            let key = localStorage.key(i);
-            if (key && key.startsWith('dupesmp_profile_')) {
-                localStorage.removeItem(key);
-            }
-        }
-    </script>
-
     <header>
         <div class="logo-area">
             <div class="logo-icon">🔮</div>
@@ -683,9 +676,9 @@
 
                 <div id="staff-pane-up" class="hidden">
                     <h3 style="font-size: 1.05rem; margin-bottom: 4px;">Staff Signup</h3>
-                    <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px;">Authorized MC Name: valid name or uuid here</p>
+                    <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px;">Authorized MC Name: Clockwrx, Zanecpvp, Prolegoboy, swordgodd</p>
                     <label style="font-size: 0.72rem; color: var(--text-muted);">Minecraft Username</label>
-                    <input type="text" id="staff-reg-user" placeholder="Username or uuid here">
+                    <input type="text" id="staff-reg-user" placeholder="Clockwrx / Zanecpvp / Prolegoboy / swordgodd">
                     <label style="font-size: 0.72rem; color: var(--text-muted);">Staff API Code</label>
                     <input type="text" id="staff-reg-code" placeholder="8-char API code" maxlength="8" style="text-transform: uppercase;">
                     <label style="font-size: 0.72rem; color: var(--text-muted);">Password</label>
@@ -697,12 +690,51 @@
     </div>
 
     <script>
+        // ==========================================
+        // FIREBASE CLOUD DATABASE CONFIGURATION
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAcKzlLnxLbZzykhzVrGt-lc24FKd-M3HE",
+            authDomain: "dupesmp-support.firebaseapp.com",
+            databaseURL: "https://dupesmp-support-default-rtdb.firebaseio.com",
+            projectId: "dupesmp-support",
+            storageBucket: "dupesmp-support.firebasestorage.app",
+            messagingSenderId: "618244238397",
+            appId: "1:618244238397:web:2cfd02d8b3013281548e54",
+            measurementId: "G-MGNJWVEQFZ"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
         const allowedStaffNames = ["CLOCKWRX", "ZANECPVP", "PROLEGOBOY", "SWORDGODD"];
 
         let currentSession = null; 
         let selectedPlatform = "Java";
         let activeTicketId = null;
         let ticketsDatabase = [];
+        let profilesDatabase = {};
+        let staffDatabase = {};
+
+        // Real-time Cloud Listeners for Global Sync
+        db.ref('tickets').on('value', (snapshot) => {
+            ticketsDatabase = snapshot.val() || [];
+            if (currentSession && document.getElementById('view-home').classList.contains('hidden') === false) {
+                renderTicketsDashboard();
+            }
+            if (activeTicketId !== null) {
+                renderChatMessages();
+            }
+        });
+
+        db.ref('profiles').on('value', (snapshot) => {
+            profilesDatabase = snapshot.val() || {};
+        });
+
+        db.ref('staff').on('value', (snapshot) => {
+            staffDatabase = snapshot.val() || {};
+        });
 
         function openModal(mode) {
             document.getElementById('auth-modal').classList.add('active');
@@ -757,11 +789,9 @@
             const pass = document.getElementById('staff-login-pass').value.trim();
             if (!code || code.length !== 8 || !pass) return alert("Please provide a valid 8-character API code and password.");
 
-            let staffDb = JSON.parse(localStorage.getItem('dupesmp_staff_db')) || {};
             let foundStaffName = null;
-            
-            for (let name in staffDb) {
-                if (staffDb[name].code === code && staffDb[name].pass === pass) {
+            for (let name in staffDatabase) {
+                if (staffDatabase[name].code === code && staffDatabase[name].pass === pass) {
                     foundStaffName = name;
                     break;
                 }
@@ -786,16 +816,18 @@
             }
 
             if (!allowedStaffNames.includes(username.toUpperCase())) {
-                return alert("Registration Failed: Only Verified staff can hold staff accounts.");
+                return alert("Registration Failed: Only Clockwrx, Zanecpvp, Prolegoboy, or swordgodd can hold staff accounts.");
             }
 
-            let staffDb = JSON.parse(localStorage.getItem('dupesmp_staff_db')) || {};
-            staffDb[username.toUpperCase()] = { code: code, pass: pass };
-            localStorage.setItem('dupesmp_staff_db', JSON.stringify(staffDb));
-
-            alert("Staff account created successfully! You can now sign in using your API code.");
-            switchStaffSub('in');
-            document.getElementById('staff-login-code').value = code;
+            db.ref('staff/' + username.toUpperCase()).set({ code: code, pass: pass }, (error) => {
+                if (error) {
+                    alert("Registration failed: " + error.message);
+                } else {
+                    alert("Staff account created successfully! You can now sign in using your API code.");
+                    switchStaffSub('in');
+                    document.getElementById('staff-login-code').value = code;
+                }
+            });
         }
 
         function logoutUser() {
@@ -882,20 +914,24 @@
                 return;
             }
 
-            let profile = localStorage.getItem('dupesmp_profile_' + code);
-            let staffDb = JSON.parse(localStorage.getItem('dupesmp_staff_db')) || {};
+            let pData = profilesDatabase[code];
             let isStaffMatch = "No";
-            for(let name in staffDb) {
-                if(staffDb[name].code === code) isStaffMatch = "Yes (" + name + ")";
+            for(let name in staffDatabase) {
+                if(staffDatabase[name].code === code) isStaffMatch = "Yes (" + name + ")";
             }
 
-            if (profile || isStaffMatch !== "No") {
-                let pData = profile ? JSON.parse(profile) : { ign: "Staff Account", platform: "N/A", yt: "None", twitch: "None", tiktok: "None" };
-                resBox.innerHTML = `Found! IGN/User: <b>${pData.ign}</b><br>` +
-                                   `Platform: <b>${pData.platform || 'N/A'}</b> | Staff: <b>${isStaffMatch}</b><br>` +
-                                   `YouTube: <a href="${pData.yt || '#'}" target="_blank" style="color:#c77dff;">${pData.yt || 'None'}</a><br>` +
-                                   `Twitch: <a href="${pData.twitch || '#'}" target="_blank" style="color:#c77dff;">${pData.twitch || 'None'}</a><br>` +
-                                   `TikTok: <a href="${pData.tiktok || '#'}" target="_blank" style="color:#c77dff;">${pData.tiktok || 'None'}</a>`;
+            if (pData || isStaffMatch !== "No") {
+                let ign = pData ? pData.ign : "Staff Account";
+                let platform = pData ? (pData.platform || 'N/A') : "N/A";
+                let yt = pData ? (pData.yt || 'None') : 'None';
+                let twitch = pData ? (pData.twitch || 'None') : 'None';
+                let tiktok = pData ? (pData.tiktok || 'None') : 'None';
+
+                resBox.innerHTML = `Found! IGN/User: <b>${ign}</b><br>` +
+                                   `Platform: <b>${platform}</b> | Staff: <b>${isStaffMatch}</b><br>` +
+                                   `YouTube: <a href="${yt}" target="_blank" style="color:#c77dff;">${yt}</a><br>` +
+                                   `Twitch: <a href="${twitch}" target="_blank" style="color:#c77dff;">${twitch}</a><br>` +
+                                   `TikTok: <a href="${tiktok}" target="_blank" style="color:#c77dff;">${tiktok}</a>`;
             } else {
                 resBox.innerText = "No records found for code: " + code;
             }
@@ -910,16 +946,16 @@
                 return;
             }
 
-            let profileData = JSON.parse(localStorage.getItem('dupesmp_profile_' + code)) || { ign: "Player_" + code, platform: "Java", version: "1.21.11" };
+            let pData = profilesDatabase[code] || { ign: "Player_" + code };
 
             let initialMessages = [
                 { sender: "DupeSMP Bot", text: `Welcome to DupeSMP Support! Ticket opened under category: ${category}. Provide your username and platform to get the conversation started.` }
             ];
 
             const newTicket = {
-                id: ticketsDatabase.length + 1,
+                id: ticketsDatabase.length > 0 ? ticketsDatabase.length + 1 : 1,
                 code: code,
-                ign: profileData.ign,
+                ign: pData.ign,
                 category: category,
                 status: "Open",
                 unreadCounts: { player: 0, staff: 0 },
@@ -927,29 +963,28 @@
             };
 
             ticketsDatabase.push(newTicket);
-            localStorage.setItem('dupesmp_tickets_db', JSON.stringify(ticketsDatabase));
-
-            alert(`Ticket #${newTicket.id} successfully created for ${profileData.ign} under ${category}!`);
-            toggleStaffPanel();
-            renderTicketsDashboard();
+            db.ref('tickets').set(ticketsDatabase, (error) => {
+                if (error) {
+                    alert("Error opening ticket: " + error.message);
+                } else {
+                    alert(`Ticket #${newTicket.id} successfully created for ${pData.ign} under ${category}!`);
+                    toggleStaffPanel();
+                    renderTicketsDashboard();
+                }
+            });
         }
 
         function renderStaffDatabaseTable() {
             const table = document.getElementById('staff-database-table');
             table.innerHTML = `<tr><th>User / Code</th><th>Details / Pass</th></tr>`;
 
-            let staffDb = JSON.parse(localStorage.getItem('dupesmp_staff_db')) || {};
-            for (let name in staffDb) {
-                table.innerHTML += `<tr><td>${name} (Staff)</td><td>Code: ${staffDb[name].code} | Pass: ${staffDb[name].pass}</td></tr>`;
+            for (let name in staffDatabase) {
+                table.innerHTML += `<tr><td>${name} (Staff)</td><td>Code: ${staffDatabase[name].code} | Pass: ${staffDatabase[name].pass}</td></tr>`;
             }
 
-            for (let i = 0; i < localStorage.length; i++) {
-                let key = localStorage.key(i);
-                if (key.startsWith('dupesmp_profile_')) {
-                    let code = key.replace('dupesmp_profile_', '');
-                    let p = JSON.parse(localStorage.getItem(key));
-                    table.innerHTML += `<tr><td>Code: ${code}</td><td>IGN: ${p.ign} | YT: ${p.yt ? 'Linked' : 'None'}</td></tr>`;
-                }
+            for (let code in profilesDatabase) {
+                let p = profilesDatabase[code];
+                table.innerHTML += `<tr><td>Code: ${code}</td><td>IGN: ${p.ign} | YT: ${p.yt ? 'Linked' : 'None'}</td></tr>`;
             }
         }
 
@@ -989,9 +1024,15 @@
             if (!ign) return alert("Please enter your Minecraft IGN.");
 
             let profileData = { ign: ign, disc: disc, version: version, platform: selectedPlatform, yt: yt, twitch: twitch, tiktok: tiktok };
-            localStorage.setItem('dupesmp_profile_' + currentSession.identifier, JSON.stringify(profileData));
-            alert("Profile saved successfully!");
-            goHome();
+            
+            db.ref('profiles/' + currentSession.identifier).set(profileData, (error) => {
+                if (error) {
+                    alert("Error saving profile: " + error.message);
+                } else {
+                    alert("Profile saved successfully to cloud!");
+                    goHome();
+                }
+            });
         }
 
         function createNewTicket(category) {
@@ -1001,16 +1042,16 @@
                 return;
             }
 
-            let profileData = JSON.parse(localStorage.getItem('dupesmp_profile_' + currentSession.identifier)) || { ign: currentSession.isStaff ? currentSession.name : "Player", platform: "Java", version: "1.21.11" };
+            let pData = profilesDatabase[currentSession.identifier] || { ign: currentSession.isStaff ? currentSession.name : "Player" };
             
             let initialMessages = [
                 { sender: "DupeSMP Bot", text: `Welcome to DupeSMP Support! Ticket opened under category: ${category}. Provide your username and platform to get the conversation started.` }
             ];
 
             const newTicket = {
-                id: ticketsDatabase.length + 1,
+                id: ticketsDatabase.length > 0 ? ticketsDatabase.length + 1 : 1,
                 code: currentSession.identifier,
-                ign: profileData.ign,
+                ign: pData.ign,
                 category: category,
                 status: "Open",
                 unreadCounts: { player: 0, staff: 0 },
@@ -1018,9 +1059,9 @@
             };
 
             ticketsDatabase.push(newTicket);
-            localStorage.setItem('dupesmp_tickets_db', JSON.stringify(ticketsDatabase));
-            
-            openChatView(newTicket.id);
+            db.ref('tickets').set(ticketsDatabase, () => {
+                openChatView(newTicket.id);
+            });
         }
 
         function renderTicketsDashboard() {
@@ -1081,7 +1122,7 @@
                 } else {
                     ticket.unreadCounts.player = 0;
                 }
-                localStorage.setItem('dupesmp_tickets_db', JSON.stringify(ticketsDatabase));
+                db.ref('tickets').set(ticketsDatabase);
             }
 
             hideAllViews();
@@ -1096,14 +1137,14 @@
             qrBar.innerHTML = "";
             if (!ticket || ticket.status === "Closed") return;
 
-            let profileData = JSON.parse(localStorage.getItem('dupesmp_profile_' + currentSession.identifier)) || { ign: currentSession.isStaff ? currentSession.name : "Player", platform: "Java", version: "1.21.11" };
+            let pData = profilesDatabase[currentSession.identifier] || { ign: currentSession.isStaff ? currentSession.name : "Player", platform: "Java", version: "1.21.11" };
 
-            qrBar.innerHTML += `<button class="qr-btn" onclick="sendPlayerQuickReply('My username is ${profileData.ign} and my platform is ${profileData.platform || 'Java'}.')">1. Provide username & platform</button>`;
-            qrBar.innerHTML += `<button class="qr-btn" onclick="sendPlayerQuickReply('I am on version ${profileData.version || '1.21.11'}.')">2. What version are you on?</button>`;
+            qrBar.innerHTML += `<button class="qr-btn" onclick="sendPlayerQuickReply('My username is ${pData.ign} and my platform is ${pData.platform || 'Java'}.')">1. Provide username & platform</button>`;
+            qrBar.innerHTML += `<button class="qr-btn" onclick="sendPlayerQuickReply('I am on version ${pData.version || '1.21.11'}.')">2. What version are you on?</button>`;
 
             if (ticket.category === "General Support" || ticket.category === "Bug support" || ticket.category === "Player report") {
                 qrBar.innerHTML += `<button class="qr-btn" onclick="fillInputBox('Medal clip: Your medal clip link here!')">3. Send Clip (Medal)</button>`;
-                qrBar.innerHTML += `<button class="qr-btn" onclick="sendPlayerQuickReply('I don't have one')">I don't have one</button>`;
+                qrBar.innerHTML += `<button class="qr-btn" onclick="sendPlayerQuickReply('I don\'t have one')">I don't have one</button>`;
             } else if (ticket.category === "Purchase support") {
                 qrBar.innerHTML += `<button class="qr-btn" onclick="sendPlayerQuickReply('Here is my receipt code: TEBEX-123456')">3. Provide Receipt</button>`;
                 qrBar.innerHTML += `<button class="qr-btn" onclick="sendPlayerQuickReply('I dont have a receipt')">I dont have one</button>`;
@@ -1137,9 +1178,9 @@
             const ticket = ticketsDatabase.find(t => t.id === activeTicketId);
             if (!ticket || ticket.status === "Closed") return;
 
-            let profileData = JSON.parse(localStorage.getItem('dupesmp_profile_' + currentSession.identifier)) || { ign: ticket.ign };
+            let pData = profilesDatabase[currentSession.identifier] || { ign: ticket.ign };
             
-            ticket.messages.push({ sender: profileData.ign, text: text });
+            ticket.messages.push({ sender: pData.ign, text: text });
             incrementUnread(ticket, 'player');
 
             setTimeout(() => {
@@ -1147,7 +1188,7 @@
                 let textLower = text.toLowerCase();
 
                 if (textLower.includes("username") || textLower.includes("platform")) {
-                    botReply = `What version are you on? Exp. ${profileData.version || '1.21.11'}`;
+                    botReply = `What version are you on? Exp. ${pData.version || '1.21.11'}`;
                 } else if (textLower.includes("version")) {
                     if (ticket.category === "General Support" || ticket.category === "Bug support") {
                         botReply = `What are you experiencing? If you do have a clip please send it to us for evidence to fix the bug.`;
@@ -1164,11 +1205,11 @@
                     if (ticket.category === "Media application") {
                         botReply = `after clip please be patiant while out staff handles this! you will get a responce soon!`;
                     } else {
-                        botReply = `Thanks for the clip ${profileData.ign}! We will getour staff here shortly.`;
+                        botReply = `Thanks for the clip ${pData.ign}! We will getour staff here shortly.`;
                     }
                 } else if (textLower.includes("i don't have one") || textLower.includes("i dont have one")) {
                     if (ticket.category === "General Support" || ticket.category === "Bug support") {
-                        botReply = `The clip is invalid, please send a valid clip! No clip then say I dont have one. Thanks for the clip ${profileData.ign}! We will getour staff here shortly.`;
+                        botReply = `The clip is invalid, please send a valid clip! No clip then say I dont have one. Thanks for the clip ${pData.ign}! We will getour staff here shortly.`;
                     } else {
                         botReply = `Thanks for sharing that with us! We will get staff on your way.`;
                     }
@@ -1187,12 +1228,11 @@
                 if (botReply) {
                     ticket.messages.push({ sender: "DupeSMP Bot", text: botReply });
                     incrementUnread(ticket, 'staff');
-                    localStorage.setItem('dupesmp_tickets_db', JSON.stringify(ticketsDatabase));
-                    renderChatMessages();
+                    db.ref('tickets').set(ticketsDatabase);
                 }
             }, 500);
 
-            localStorage.setItem('dupesmp_tickets_db', JSON.stringify(ticketsDatabase));
+            db.ref('tickets').set(ticketsDatabase);
             renderChatMessages();
         }
 
@@ -1253,8 +1293,8 @@
             const ticket = ticketsDatabase.find(t => t.id === activeTicketId);
             if (!ticket || ticket.status === "Closed") return;
 
-            let profileData = JSON.parse(localStorage.getItem('dupesmp_profile_' + currentSession.identifier)) || { ign: currentSession.name };
-            const senderLabel = currentSession.isStaff ? currentSession.name : profileData.ign;
+            let pData = profilesDatabase[currentSession.identifier] || { ign: currentSession.name };
+            const senderLabel = currentSession.isStaff ? currentSession.name : pData.ign;
 
             ticket.messages.push({ sender: senderLabel, text: text });
             
@@ -1273,7 +1313,7 @@
                         botFollowUp = `Thanks for detailing your experience! Staff will be with you shortly.`;
                     } else if (ticket.category === "Bug support" || ticket.category === "Player report") {
                         if (textLower.includes("medal clip:")) {
-                            botFollowUp = `Thanks for the clip ${profileData.ign}! We will getour staff here shortly.`;
+                            botFollowUp = `Thanks for the clip ${pData.ign}! We will getour staff here shortly.`;
                         }
                     }
                 }
@@ -1281,12 +1321,11 @@
                 if (botFollowUp) {
                     ticket.messages.push({ sender: "DupeSMP Bot", text: botFollowUp });
                     incrementUnread(ticket, 'staff');
-                    localStorage.setItem('dupesmp_tickets_db', JSON.stringify(ticketsDatabase));
-                    renderChatMessages();
+                    db.ref('tickets').set(ticketsDatabase);
                 }
             }, 500);
 
-            localStorage.setItem('dupesmp_tickets_db', JSON.stringify(ticketsDatabase));
+            db.ref('tickets').set(ticketsDatabase);
             textInput.value = "";
             renderChatMessages();
             renderPlayerQuickRepliesBar();
@@ -1297,9 +1336,10 @@
             if (!ticket) return;
 
             ticket.status = ticket.status === "Open" ? "Closed" : "Open";
-            localStorage.setItem('dupesmp_tickets_db', JSON.stringify(ticketsDatabase));
-            renderChatMessages();
-            renderPlayerQuickRepliesBar();
+            db.ref('tickets').set(ticketsDatabase, () => {
+                renderChatMessages();
+                renderPlayerQuickRepliesBar();
+            });
         }
 
         function goHome() {
@@ -1313,15 +1353,15 @@
             document.getElementById('view-profile').classList.remove('hidden');
             document.getElementById('prof-code').value = currentSession.identifier;
             
-            let profileData = JSON.parse(localStorage.getItem('dupesmp_profile_' + currentSession.identifier));
-            if (profileData) {
-                document.getElementById('prof-ign').value = profileData.ign || "";
-                document.getElementById('prof-disc').value = profileData.disc || "";
-                document.getElementById('prof-version').value = profileData.version || "1.21.11";
-                document.getElementById('prof-yt').value = profileData.yt || "";
-                document.getElementById('prof-twitch').value = profileData.twitch || "";
-                document.getElementById('prof-tiktok').value = profileData.tiktok || "";
-                if (profileData.platform) setPlatform(profileData.platform);
+            let pData = profilesDatabase[currentSession.identifier];
+            if (pData) {
+                document.getElementById('prof-ign').value = pData.ign || "";
+                document.getElementById('prof-disc').value = pData.disc || "";
+                document.getElementById('prof-version').value = pData.version || "1.21.11";
+                document.getElementById('prof-yt').value = pData.yt || "";
+                document.getElementById('prof-twitch').value = pData.twitch || "";
+                document.getElementById('prof-tiktok').value = pData.tiktok || "";
+                if (pData.platform) setPlatform(pData.platform);
             } else {
                 document.getElementById('prof-ign').value = currentSession.isStaff ? currentSession.name : "";
                 document.getElementById('prof-disc').value = "";
