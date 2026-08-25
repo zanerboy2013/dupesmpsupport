@@ -690,9 +690,6 @@
     </div>
 
     <script>
-        // ==========================================
-        // FIREBASE CLOUD DATABASE CONFIGURATION
-        // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyAcKzlLnxLbZzykhzVrGt-lc24FKd-M3HE",
             authDomain: "dupesmp-support.firebaseapp.com",
@@ -704,7 +701,6 @@
             measurementId: "G-MGNJWVEQFZ"
         };
 
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
@@ -717,7 +713,7 @@
         let profilesDatabase = {};
         let staffDatabase = {};
 
-        // Real-time Cloud Listeners for Global Sync
+        // Real-time Cloud Listeners
         db.ref('tickets').on('value', (snapshot) => {
             ticketsDatabase = snapshot.val() || [];
             if (currentSession && document.getElementById('view-home').classList.contains('hidden') === false) {
@@ -734,6 +730,8 @@
 
         db.ref('staff').on('value', (snapshot) => {
             staffDatabase = snapshot.val() || {};
+        }, (error) => {
+            console.error("Firebase read error:", error);
         });
 
         function openModal(mode) {
@@ -821,7 +819,7 @@
 
             db.ref('staff/' + username.toUpperCase()).set({ code: code, pass: pass }, (error) => {
                 if (error) {
-                    alert("Registration failed: " + error.message);
+                    alert("Firebase Permission Error: " + error.message + "\n\nMake sure your Firebase Realtime Database rules are set to .read: true and .write: true!");
                 } else {
                     alert("Staff account created successfully! You can now sign in using your API code.");
                     switchStaffSub('in');
