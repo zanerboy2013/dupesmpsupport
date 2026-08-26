@@ -1,0 +1,9 @@
+// Fade out loader after 3.5 seconds or once fully loaded
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        const loader = document.getElementById('app-loading-screen');
+        if (loader) {
+            loader.classList.add('fade-out');
+        }
+    }, 3500); // Adjust milliseconds if needed
+});
