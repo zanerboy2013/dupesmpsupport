@@ -3,23 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DupeSMP | Support Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>DupeSMP | Support & Staff Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Firebase SDKs for Global Cloud Persistence on GitHub Pages -->
+    <!-- Firebase SDKs for Cloud Persistence on GitHub Pages -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
     <style>
         :root {
-            --bg-dark: #0d0a14;
-            --card-bg: #151122;
-            --card-hover: #1e1830;
-            --border-clr: #2d2446;
+            --bg-dark: #07050d;
+            --card-bg: rgba(19, 15, 31, 0.75);
+            --card-hover: rgba(28, 21, 46, 0.9);
+            --border-clr: rgba(157, 78, 221, 0.18);
+            --border-hover: rgba(157, 78, 221, 0.6);
             --accent-purple: #9d4edd;
             --accent-hover: #b57eed;
             --text-main: #ffffff;
-            --text-muted: #a39bc2;
+            --text-muted: #9c92bd;
             --success-green: #38b000;
         }
 
@@ -30,425 +31,564 @@
             font-family: 'Inter', sans-serif;
         }
 
+        /* --- ENHANCED ANIMATIONS --- */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(16px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(5deg); }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(157, 78, 221, 0.3); }
+            50% { box-shadow: 0 0 35px rgba(157, 78, 221, 0.7); }
+        }
+
+        @keyframes floatParticle {
+            0% { transform: translateY(0) translateX(0) scale(0.8); opacity: 0; }
+            50% { opacity: 0.7; scale: 1.2; }
+            100% { transform: translateY(-120vh) translateX(60px) scale(0.8); opacity: 0; }
+        }
+
+        @keyframes rainbowGlow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        @keyframes shimmerEffect {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
         html, body {
             background-color: var(--bg-dark);
-            background-image: radial-gradient(rgba(157, 78, 221, 0.08) 1px, transparent 0);
-            background-size: 24px 24px;
             color: var(--text-main);
             width: 100%;
             min-height: 100vh;
             overflow-x: hidden;
+            animation: fadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body.rainbow-mode {
+            animation: rainbowGlow 4s linear infinite;
+        }
+
+        /* Animated Floating Ambient Particles Background */
+        .particles-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .particle {
+            position: absolute;
+            background: rgba(157, 78, 221, 0.4);
+            border-radius: 50%;
+            animation: floatParticle 7s linear infinite;
         }
 
         body {
             display: flex;
             flex-direction: column;
+            position: relative;
+            z-index: 1;
         }
 
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 18px 40px;
-            background-color: #08060f;
+            padding: 20px 45px;
+            background-color: rgba(7, 5, 13, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--border-clr);
             position: sticky;
             top: 0;
             z-index: 100;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+            animation: fadeIn 0.5s ease-out;
         }
 
         .logo-area {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 14px;
             font-weight: 800;
-            font-size: 1.25rem;
+            font-size: 1.3rem;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+        .logo-area:hover { transform: scale(1.04) rotate(-1deg); }
 
         .logo-icon {
-            width: 32px;
-            height: 32px;
+            width: 42px;
+            height: 42px;
             background: linear-gradient(135deg, #7b2cbf, #c77dff);
-            border-radius: 6px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
-            box-shadow: 0 0 12px rgba(157, 78, 221, 0.4);
+            font-size: 20px;
+            box-shadow: 0 0 20px rgba(157, 78, 221, 0.7);
+            animation: floatIcon 3.5s ease-in-out infinite;
         }
 
         .header-actions {
             display: flex;
             align-items: center;
             gap: 12px;
+            flex-wrap: wrap;
         }
 
         .btn {
-            background-color: var(--accent-purple);
+            background: linear-gradient(135deg, #7b2cbf, #9d4edd);
             color: white;
             border: none;
-            padding: 8px 18px;
-            border-radius: 6px;
+            padding: 10px 20px;
+            border-radius: 10px;
             cursor: pointer;
             font-weight: 600;
             font-size: 0.85rem;
-            transition: background 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 12px rgba(157, 78, 221, 0.3);
+            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 20px rgba(157, 78, 221, 0.4);
+            position: relative;
+            overflow: hidden;
         }
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(60deg, transparent, rgba(255,255,255,0.15), transparent);
+            transform: rotate(30deg) translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+        .btn:hover::after { transform: rotate(30deg) translateX(100%); }
         .btn:hover { 
-            background-color: var(--accent-hover); 
-            box-shadow: 0 4px 16px rgba(157, 78, 221, 0.5);
+            background: linear-gradient(135deg, #9d4edd, #c77dff);
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 8px 30px rgba(157, 78, 221, 0.7);
         }
 
         .btn-secondary {
-            background-color: #241d3b;
+            background: rgba(33, 25, 56, 0.6);
             color: #d8d0ef;
+            backdrop-filter: blur(8px);
             box-shadow: none;
+            border: 1px solid var(--border-clr);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .btn-secondary:hover { background-color: #31284f; }
+        .btn-secondary:hover { background: rgba(45, 35, 77, 0.9); border-color: var(--accent-purple); color: white; transform: translateY(-3px); }
 
         .btn-danger {
-            background-color: #d90429;
-            box-shadow: none;
+            background: linear-gradient(135deg, #9b001c, #d90429);
+            box-shadow: 0 4px 18px rgba(217, 4, 41, 0.4);
         }
-        .btn-danger:hover { background-color: #ef233c; }
+        .btn-danger:hover { background: linear-gradient(135deg, #d90429, #ef233c); box-shadow: 0 6px 24px rgba(217, 4, 41, 0.7); }
+
+        .btn-success {
+            background: linear-gradient(135deg, #2d8a00, #38b000);
+            box-shadow: 0 4px 18px rgba(56, 176, 0, 0.4);
+        }
+        .btn-success:hover { background: linear-gradient(135deg, #38b000, #4cc900); }
 
         main {
             flex: 1;
-            max-width: 950px;
+            max-width: 980px;
             width: 100%;
-            margin: 40px auto;
-            padding: 0 20px 40px 20px;
+            margin: 45px auto;
+            padding: 0 20px 50px 20px;
+            animation: fadeIn 0.4s ease-out;
         }
 
         .hidden { display: none !important; }
 
         .hero {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
 
         .hero h1 {
-            font-size: 2.8rem;
+            font-size: 3.2rem;
             font-weight: 900;
             font-family: monospace;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             text-transform: uppercase;
-            background: linear-gradient(180deg, #ffffff 0%, #c77dff 100%);
+            letter-spacing: 1.5px;
+            background: linear-gradient(180deg, #ffffff 20%, #c77dff 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            text-shadow: 0 15px 35px rgba(157, 78, 221, 0.3);
+            animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .hero p {
             color: var(--text-muted);
-            font-size: 0.92rem;
+            font-size: 1rem;
+            letter-spacing: 0.3px;
         }
 
         .search-wrap {
-            max-width: 620px;
-            margin: 0 auto 30px auto;
+            max-width: 650px;
+            margin: 0 auto 40px auto;
+            position: relative;
         }
 
         .search-box {
             width: 100%;
-            padding: 15px 18px;
-            background-color: var(--card-bg);
+            padding: 18px 22px;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
             border: 1px solid var(--border-clr);
-            border-radius: 10px;
+            border-radius: 14px;
             color: white;
-            font-size: 0.92rem;
+            font-size: 1rem;
             outline: none;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.5), 0 8px 25px rgba(0,0,0,0.3);
         }
-        .search-box:focus { border-color: var(--accent-purple); }
+        .search-box:focus { 
+            border-color: var(--accent-purple); 
+            box-shadow: 0 0 30px rgba(157, 78, 221, 0.5), inset 0 2px 6px rgba(0,0,0,0.5); 
+            transform: scale(1.02);
+        }
+
+        /* Simplified Search Dropdown with Smooth Animation */
+        #search-results-dropdown {
+            position: absolute;
+            top: 65px;
+            left: 0;
+            right: 0;
+            background: rgba(19, 15, 31, 0.98);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--accent-purple);
+            border-radius: 12px;
+            max-height: 280px;
+            overflow-y: auto;
+            z-index: 150;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+            display: none;
+            padding: 8px;
+            text-align: left;
+            animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .search-result-item {
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            border-bottom: 1px solid rgba(157, 78, 221, 0.15);
+        }
+        .search-result-item:hover {
+            background: rgba(157, 78, 221, 0.3);
+            transform: translateX(4px);
+        }
 
         .sec-title {
             display: flex;
             align-items: baseline;
-            gap: 10px;
-            margin-bottom: 16px;
-            margin-top: 20px;
+            gap: 14px;
+            margin-bottom: 20px;
+            margin-top: 30px;
         }
-        .sec-title h2 { font-size: 1.15rem; font-weight: 700; }
-        .sec-title span { color: var(--text-muted); font-size: 0.82rem; }
+        .sec-title h2 { font-size: 1.25rem; font-weight: 700; letter-spacing: 0.5px; }
+        .sec-title span { color: var(--text-muted); font-size: 0.85rem; }
 
         .cat-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-            gap: 14px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 18px;
+            margin-bottom: 40px;
         }
 
         .cat-card {
-            background-color: var(--card-bg);
+            background: var(--card-bg);
+            backdrop-filter: blur(14px);
             border: 1px solid var(--border-clr);
-            padding: 20px;
-            border-radius: 10px;
+            padding: 24px;
+            border-radius: 14px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            transition: transform 0.15s ease, background 0.15s ease;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        .cat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-purple), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
         .cat-card:hover {
-            background-color: var(--card-hover);
-            transform: translateY(-2px);
+            background: var(--card-hover);
+            transform: translateY(-8px) scale(1.02);
+            border-color: var(--border-hover);
+            box-shadow: 0 15px 40px rgba(157, 78, 221, 0.3);
         }
+        .cat-card:hover::before { opacity: 1; }
 
         .card-top {
             display: flex;
-            gap: 14px;
-            margin-bottom: 16px;
+            gap: 16px;
+            margin-bottom: 20px;
         }
 
         .card-ico {
-            width: 38px;
-            height: 38px;
-            background: #241d3b;
-            border-radius: 8px;
+            width: 46px;
+            height: 46px;
+            background: rgba(33, 25, 56, 0.8);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1rem;
+            font-size: 1.25rem;
             flex-shrink: 0;
+            border: 1px solid var(--border-clr);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+        .cat-card:hover .card-ico { transform: scale(1.15) rotate(6deg); }
 
-        .card-txt h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 3px; }
-        .card-txt p { font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; }
+        .card-txt h4 { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; }
+        .card-txt p { font-size: 0.86rem; color: var(--text-muted); line-height: 1.5; }
 
         .start-lnk {
             background: none; border: none; color: #c77dff;
-            font-size: 0.82rem; font-weight: 600; cursor: pointer; text-align: left; padding: 0;
+            font-size: 0.88rem; font-weight: 700; cursor: pointer; text-align: left; padding: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.25s ease;
         }
-        .start-lnk:hover { text-decoration: underline; }
+        .start-lnk:hover { color: #e0aaff; transform: translateX(6px); }
 
         .ticket-list-item {
-            background: #0d0a14;
-            padding: 15px;
-            border-radius: 8px;
+            background: rgba(17, 13, 26, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 18px 22px;
+            border-radius: 12px;
             border: 1px solid var(--border-clr);
-            margin-bottom: 10px;
+            margin-bottom: 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            position: relative;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .ticket-list-item:hover { transform: translateX(8px); border-color: var(--border-hover); background: rgba(26, 19, 41, 0.95); }
+
+        .app-box {
+            background: rgba(9, 7, 15, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-clr);
+            border-radius: 14px;
+            padding: 22px 26px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .app-box:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(157, 78, 221, 0.25);
         }
 
         .unread-badge {
-            background-color: #d90429;
+            background: linear-gradient(135deg, #9b001c, #d90429);
             color: white;
             font-size: 0.75rem;
             font-weight: 700;
-            padding: 2px 7px;
-            border-radius: 10px;
+            padding: 3px 9px;
+            border-radius: 14px;
             margin-left: 10px;
             display: inline-block;
-            box-shadow: 0 0 8px rgba(217, 4, 41, 0.6);
+            box-shadow: 0 0 15px rgba(217, 4, 41, 0.7);
+            animation: pulseGlow 2s infinite;
         }
 
-        /* Staff Panel Dropdown / Frame Styles */
-        .staff-panel-wrapper {
-            position: relative;
-        }
+        .staff-panel-wrapper { position: relative; }
 
         .staff-dropdown-frame {
             position: absolute;
-            top: 45px;
+            top: 55px;
             right: 0;
-            width: 380px;
-            background-color: var(--card-bg);
+            width: 440px;
+            background: rgba(19, 15, 31, 0.95);
+            backdrop-filter: blur(20px);
             border: 1px solid var(--accent-purple);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 16px 45px rgba(0,0,0,0.8);
             z-index: 200;
-        }
-
-        .staff-dropdown-frame h3 {
-            font-size: 1rem;
-            margin-bottom: 12px;
-            color: #c77dff;
-            border-bottom: 1px solid var(--border-clr);
-            padding-bottom: 6px;
+            animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .staff-db-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.78rem;
-            margin-top: 10px;
+            font-size: 0.8rem;
+            margin-top: 8px;
         }
         .staff-db-table th, .staff-db-table td {
             border: 1px solid var(--border-clr);
-            padding: 6px 8px;
+            padding: 8px 10px;
             text-align: left;
         }
-        .staff-db-table th {
-            background-color: #1f1635;
-            color: #c77dff;
-        }
+        .staff-db-table th { background-color: rgba(31, 22, 56, 0.8); color: #c77dff; }
 
         .chat-container {
-            background-color: var(--card-bg);
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
             border: 1px solid var(--border-clr);
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 16px;
+            padding: 24px;
             display: flex;
             flex-direction: column;
-            height: 540px;
+            height: 580px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.5);
         }
 
         .chat-messages {
             flex: 1;
-            background: #0d0a14;
+            background: rgba(9, 7, 15, 0.9);
             border: 1px solid var(--border-clr);
-            border-radius: 8px;
-            padding: 15px;
+            border-radius: 12px;
+            padding: 20px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-bottom: 12px;
+            gap: 14px;
+            margin-bottom: 16px;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.6);
         }
 
+        /* NO ANIMATIONS FOR CHAT MESSAGES AS REQUESTED PREVIOUSLY */
         .chat-msg {
-            padding: 10px 14px;
-            border-radius: 8px;
-            max-width: 75%;
-            font-size: 0.9rem;
-            line-height: 1.4;
+            padding: 14px 18px;
+            border-radius: 12px;
+            max-width: 80%;
+            font-size: 0.94rem;
+            line-height: 1.5;
         }
 
-        .chat-msg.user {
-            background: #241d3b;
-            align-self: flex-end;
-            border: 1px solid #3d2f66;
-        }
-
-        .chat-msg.bot {
-            background: #2a1b4e;
-            align-self: flex-start;
-            border: 1px solid #7b2cbf;
-        }
-
-        .chat-msg.admin {
-            background: #3c155c;
-            align-self: flex-start;
-            border: 1px solid #5a189a;
-        }
+        .chat-msg.user { background: rgba(33, 25, 56, 0.85); align-self: flex-end; border: 1px solid rgba(157, 78, 221, 0.35); }
+        .chat-msg.admin { background: rgba(57, 20, 86, 0.9); align-self: flex-start; border: 1px solid #c77dff; }
+        .chat-msg.bot { background: rgba(38, 23, 74, 0.85); align-self: flex-start; border: 1px solid rgba(157, 78, 221, 0.6); }
 
         .quick-replies-bar {
             display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
+            gap: 10px;
+            margin-bottom: 14px;
             overflow-x: auto;
-            padding-bottom: 4px;
+            padding-bottom: 6px;
         }
 
         .qr-btn {
-            background-color: #1f1635;
+            background: rgba(28, 20, 48, 0.8);
             color: #d8d0ef;
             border: 1px solid var(--accent-purple);
-            padding: 6px 12px;
+            padding: 8px 16px;
             border-radius: 20px;
-            font-size: 0.78rem;
+            font-size: 0.82rem;
             cursor: pointer;
             white-space: nowrap;
-            transition: background 0.2s;
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .qr-btn:hover {
-            background-color: var(--accent-purple);
+            background: var(--accent-purple);
             color: white;
+            box-shadow: 0 0 18px rgba(157, 78, 221, 0.7);
+            transform: translateY(-2px);
         }
 
-        .chat-input-area {
-            display: flex;
-            gap: 10px;
-        }
-
+        .chat-input-area { display: flex; gap: 12px; }
         .chat-input-area input {
             flex: 1;
-            padding: 12px;
-            background: #0d0a14;
+            padding: 14px 18px;
+            background: rgba(9, 7, 15, 0.9);
             border: 1px solid var(--border-clr);
-            border-radius: 6px;
+            border-radius: 10px;
             color: white;
             outline: none;
+            transition: all 0.25s ease;
         }
+        .chat-input-area input:focus { border-color: var(--accent-purple); box-shadow: 0 0 15px rgba(157, 78, 221, 0.3); }
 
-        .profile-card {
-            background-color: var(--card-bg);
+        .profile-card, .form-card, .applications-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
             border: 1px solid var(--border-clr);
-            padding: 30px;
-            border-radius: 12px;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+            animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .profile-card h2 { font-size: 1.5rem; margin-bottom: 6px; }
-        .profile-card > p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px; }
-
-        .input-group { margin-bottom: 16px; }
-        .input-group label { display: block; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; text-transform: uppercase; }
-        .input-group input, .input-group select { width: 100%; padding: 12px; background: #0d0a14; border: 1px solid var(--border-clr); border-radius: 6px; color: white; font-size: 0.9rem; outline: none; }
-
-        .platform-btns {
-            display: flex; gap: 8px; margin-top: 6px;
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 8px; font-weight: 700; text-transform: uppercase; }
+        .input-group input, .input-group select, .input-group textarea {
+            width: 100%; padding: 14px; background: rgba(9, 7, 15, 0.9);
+            border: 1px solid var(--border-clr); border-radius: 10px; color: white; font-size: 0.95rem; outline: none;
+            transition: all 0.25s ease;
         }
+        .input-group input:focus, .input-group select:focus, .input-group textarea:focus { border-color: var(--accent-purple); box-shadow: 0 0 15px rgba(157, 78, 221, 0.3); }
+        .input-group textarea { resize: vertical; min-height: 105px; }
+
+        .platform-btns { display: flex; gap: 10px; margin-top: 8px; }
         .plat-btn {
-            flex: 1; padding: 10px; background: #0d0a14; border: 1px solid var(--border-clr);
-            border-radius: 6px; color: var(--text-muted); font-weight: 600; cursor: pointer; font-size: 0.85rem;
+            flex: 1; padding: 12px; background: rgba(9, 7, 15, 0.9); border: 1px solid var(--border-clr);
+            border-radius: 10px; color: var(--text-muted); font-weight: 600; cursor: pointer;
+            transition: all 0.25s ease;
         }
-        .plat-btn.active { background: var(--accent-purple); color: white; border-color: var(--accent-purple); }
+        .plat-btn.active { background: var(--accent-purple); color: white; border-color: var(--accent-purple); box-shadow: 0 0 18px rgba(157, 78, 221, 0.5); }
 
         .modal {
-            display: none; 
-            position: fixed; 
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); 
-            backdrop-filter: blur(4px); 
-            justify-content: center; 
-            align-items: center; 
-            z-index: 1000;
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(4, 3, 8, 0.8); backdrop-filter: blur(10px);
+            justify-content: center; align-items: center; z-index: 1000;
         }
-        .modal.active { display: flex !important; }
-        
+        .modal.active { display: flex !important; animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
         .modal-body {
-            background: var(--card-bg); 
-            padding: 30px; 
-            border-radius: 12px; 
-            width: 390px; 
-            border: 1px solid var(--border-clr);
+            background: rgba(19, 15, 31, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 40px; border-radius: 18px; width: 500px; border: 1px solid var(--border-clr);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
         }
         .modal-body input {
-            width: 100%; padding: 12px; background: #0d0a14; border: 1px solid var(--border-clr);
-            border-radius: 6px; color: white; margin-top: 6px; margin-bottom: 14px; outline: none;
+            width: 100%; padding: 14px; background: rgba(9, 7, 15, 0.9); border: 1px solid var(--border-clr);
+            border-radius: 10px; color: white; margin-top: 8px; margin-bottom: 18px; outline: none;
         }
+        .modal-tabs { display: flex; background: rgba(9, 7, 15, 0.9); border-radius: 10px; padding: 5px; margin-bottom: 22px; border: 1px solid var(--border-clr); }
+        .m-tab { flex: 1; background: none; border: none; color: var(--text-muted); padding: 10px; font-weight: 600; cursor: pointer; border-radius: 8px; transition: all 0.25s ease; }
+        .m-tab.active { background: var(--accent-purple); color: white; box-shadow: 0 4px 15px rgba(157, 78, 221, 0.5); }
 
-        .modal-tabs {
-            display: flex; 
-            background: #0d0a14; 
-            border-radius: 6px; 
-            padding: 3px; 
-            margin-bottom: 16px; 
-            border: 1px solid var(--border-clr);
+        #easter-egg-banner {
+            position: fixed; bottom: 30px; right: 30px;
+            background: linear-gradient(135deg, #7b2cbf, #c77dff); color: white;
+            padding: 16px 26px; border-radius: 12px; font-weight: 700; z-index: 9999; display: none;
+            box-shadow: 0 10px 30px rgba(157, 78, 221, 0.7);
+            animation: fadeIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-
-        .m-tab {
-            flex: 1; 
-            background: none; 
-            border: none; 
-            color: var(--text-muted); 
-            padding: 8px; 
-            font-weight: 600; 
-            font-size: 0.8rem; 
-            cursor: pointer; 
-            border-radius: 4px;
-            transition: all 0.2s;
-        }
-        .m-tab.active { background: var(--accent-purple); color: white; }
     </style>
 </head>
 <body>
 
+    <!-- Ambient Floating Particles Background Container -->
+    <div class="particles-bg" id="particles-container"></div>
+
     <header>
-        <div class="logo-area">
+        <div class="logo-area" onclick="handleLogoClick()">
             <div class="logo-icon">🔮</div>
             DupeSMP Support
         </div>
@@ -461,19 +601,32 @@
         <div id="view-home">
             <div class="hero">
                 <h1>How can we help?</h1>
-                <p>Search quick answers or open a ticket to chat live with DupeSMP staff.</p>
+                <p>Search rules or open a ticket to chat live with DupeSMP staff.</p>
             </div>
 
+            <!-- Simplified Search Bar Powered by Staff Handbooks -->
             <div class="search-wrap">
-                <input type="text" class="search-box" placeholder="Search help... e.g. dupes, ban appeal, items">
+                <input type="text" id="main-search-input" class="search-box" placeholder="Search guidelines & rules... (e.g. Xray, Griefing, Freeze)" oninput="handleSearchInput(this.value)">
+                <div id="search-results-dropdown"></div>
             </div>
 
             <div class="sec-title">
-                <h2>Open a ticket</h2>
-                <span>pick a category — start a live text chat with staff</span>
+                <h2>Support & Applications</h2>
+                <span>pick a category — start a live text chat or submit an application</span>
             </div>
 
             <div class="cat-grid">
+                <div class="cat-card" style="border-color: rgba(157, 78, 221, 0.4);">
+                    <div class="card-top">
+                        <div class="card-ico" style="background: rgba(38, 23, 74, 0.8); border-color: var(--accent-purple);">⭐</div>
+                        <div class="card-txt">
+                            <h4>Staff Application</h4>
+                            <p>Apply for helper, moderator and administration roles.</p>
+                        </div>
+                    </div>
+                    <button class="start-lnk" onclick="goApplications()">View & Apply →</button>
+                </div>
+
                 <div class="cat-card">
                     <div class="card-top">
                         <div class="card-ico">💬</div>
@@ -543,12 +696,12 @@
 
             <div id="ticket-dashboard-section" class="hidden">
                 <div class="sec-title">
-                    <h2>Opened Tickets</h2>
-                    <span>active conversations with staff</span>
+                    <h2>Opened Support Tickets</h2>
+                    <span>active support conversations</span>
                 </div>
                 <div id="opened-tickets-container"></div>
 
-                <div class="sec-title" style="margin-top: 30px;">
+                <div class="sec-title" style="margin-top: 40px;">
                     <h2>Recent / Closed Tickets</h2>
                     <span>archived or resolved support history</span>
                 </div>
@@ -556,39 +709,86 @@
             </div>
         </div>
 
+        <div id="view-applications" class="hidden">
+            <div class="applications-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <div>
+                        <h2>⭐ Staff Applications Section</h2>
+                        <p style="margin-bottom: 0;">Submit or view your staff application status.</p>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn" onclick="openStaffApplicationForm()">+ Fill Staff Application</button>
+                        <button class="btn btn-secondary" onclick="goHome()">← Back</button>
+                    </div>
+                </div>
+                <div class="sec-title" style="margin-bottom: 16px;">
+                    <h2>Submitted Applications</h2>
+                    <span>your application submissions & review statuses</span>
+                </div>
+                <div id="user-applications-list-container"></div>
+            </div>
+        </div>
+
+        <div id="view-app-form" class="hidden">
+            <div class="form-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <div>
+                        <h2>⭐ DupeSMP In-Depth Staff Application</h2>
+                        <p style="margin-bottom: 0;">Provide detailed answers below.</p>
+                    </div>
+                    <button class="btn btn-secondary" onclick="goApplications()">← Back</button>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px;" class="input-group">
+                    <div><label>Minecraft IGN</label><input type="text" id="app-ign" placeholder="Your IGN..."></div>
+                    <div><label>Discord Username</label><input type="text" id="app-discord" placeholder="e.g. dupegod"></div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px;" class="input-group">
+                    <div><label>Your Age</label><input type="number" id="app-age" placeholder="Age..."></div>
+                    <div><label>Timezone</label><input type="text" id="app-tz" placeholder="e.g. EST"></div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px;" class="input-group">
+                    <div><label>Weekly Hours Available</label><input type="text" id="app-hours" placeholder="e.g. 15-20"></div>
+                    <div><label>PvP Familiarity</label>
+                        <select id="app-pvp-level"><option value="Expert">Expert</option><option value="Intermediate">Intermediate</option><option value="Basic">Basic</option></select>
+                    </div>
+                </div>
+                <div class="input-group"><label>Past Bans or Mutes</label><textarea id="app-bans" placeholder="Detail past punishments or state 'None'..."></textarea></div>
+                <div class="input-group"><label>Past Staff Experience</label><textarea id="app-exp" placeholder="List servers and roles..."></textarea></div>
+                <div class="input-group"><label>Scenario 1: Dupe Exploit Caught</label><textarea id="app-scenario-dupe" placeholder="Explain steps..."></textarea></div>
+                <div class="input-group"><label>Scenario 2: Chat Conflict</label><textarea id="app-scenario-chat" placeholder="Explain steps..."></textarea></div>
+                <div class="input-group"><label>Strengths & Weaknesses</label><textarea id="app-strengths-weaknesses" placeholder="Details..."></textarea></div>
+                <div class="input-group"><label>Why do you want to join?</label><textarea id="app-why" placeholder="Explain..."></textarea></div>
+
+                <div style="display: flex; gap: 14px; margin-top: 35px;">
+                    <button class="btn" onclick="submitStaffApplicationForm()">Submit Application</button>
+                    <button class="btn btn-secondary" onclick="goApplications()">Discard</button>
+                </div>
+            </div>
+        </div>
+
         <div id="view-profile" class="hidden">
             <div class="profile-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                     <div>
                         <h2>Profile Settings</h2>
-                        <p style="margin-bottom: 0;">Configure your player information for support tickets.</p>
+                        <p style="margin-bottom: 0;">Configure your player info.</p>
                     </div>
-                    <button class="btn" onclick="autoFillProfileSettings()">Auto-Fill Profile</button>
+                    <button class="btn" onclick="autoFillProfileSettings()">Auto-Fill</button>
                 </div>
 
-                <div class="input-group" style="background: #0d0a14; padding: 15px; border-radius: 8px; border: 1px solid var(--border-clr); margin-bottom: 20px;">
-                    <label style="color: #c77dff; margin-bottom: 4px;">Active In-Game API Code / Account</label>
-                    <input type="text" id="prof-code" readonly style="background: #151122 !important; font-family: monospace; font-weight: bold; letter-spacing: 1px;">
+                <div class="input-group" style="background: rgba(9, 7, 15, 0.9); padding: 18px; border-radius: 12px; border: 1px solid var(--border-clr); margin-bottom: 26px;">
+                    <label style="color: #c77dff; margin-bottom: 6px;">Active API Code</label>
+                    <input type="text" id="prof-code" readonly style="background: rgba(19, 15, 31, 0.9) !important; font-family: monospace; font-weight: bold;">
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;" class="input-group">
-                    <div>
-                        <label>Minecraft IGN</label>
-                        <input type="text" id="prof-ign" placeholder="Enter IGN...">
-                    </div>
-                    <div>
-                        <label>Discord Username</label>
-                        <input type="text" id="prof-disc" placeholder="e.g. dupegod">
-                    </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px;" class="input-group">
+                    <div><label>Minecraft IGN</label><input type="text" id="prof-ign" placeholder="IGN..."></div>
+                    <div><label>Discord Username</label><input type="text" id="prof-disc" placeholder="Discord..."></div>
                 </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;" class="input-group">
-                    <div>
-                        <label>Minecraft Version</label>
-                        <input type="text" id="prof-version" placeholder="e.g. 1.21.11">
-                    </div>
-                    <div>
-                        <label>Platform</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px;" class="input-group">
+                    <div><label>Minecraft Version</label><input type="text" id="prof-version" value="1.21.4"></div>
+                    <div><label>Platform</label>
                         <div class="platform-btns" style="margin-top: 0;">
                             <button class="plat-btn active" id="p-java" onclick="setPlatform('Java')">Java</button>
                             <button class="plat-btn" id="p-bedrock" onclick="setPlatform('Bedrock')">Bedrock</button>
@@ -597,24 +797,11 @@
                     </div>
                 </div>
 
-                <div class="sec-title" style="margin-top: 25px; margin-bottom: 12px;">
-                    <h2>Social Media Links</h2>
-                    <span>used for media applications & verification</span>
-                </div>
-                <div class="input-group">
-                    <label>YouTube Link</label>
-                    <input type="text" id="prof-yt" placeholder="https://youtube.com/@yourchannel">
-                </div>
-                <div class="input-group">
-                    <label>Twitch Link</label>
-                    <input type="text" id="prof-twitch" placeholder="https://twitch.tv/yourchannel">
-                </div>
-                <div class="input-group">
-                    <label>TikTok Link</label>
-                    <input type="text" id="prof-tiktok" placeholder="https://tiktok.com/@yourchannel">
-                </div>
+                <div class="input-group"><label>YouTube Link</label><input type="text" id="prof-yt" placeholder="https://youtube.com/@..."></div>
+                <div class="input-group"><label>Twitch Link</label><input type="text" id="prof-twitch" placeholder="https://twitch.tv/..."></div>
+                <div class="input-group"><label>TikTok Link</label><input type="text" id="prof-tiktok" placeholder="https://tiktok.com/@..."></div>
 
-                <div style="display: flex; gap: 10px; margin-top: 25px;">
+                <div style="display: flex; gap: 14px; margin-top: 35px;">
                     <button class="btn" onclick="saveProfile()">Save Profile</button>
                     <button class="btn btn-secondary" onclick="goHome()">Cancel</button>
                 </div>
@@ -622,86 +809,204 @@
         </div>
 
         <div id="view-chat" class="hidden">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <button class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.8rem;" onclick="goHome()">← Back to Dashboard</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <button class="btn btn-secondary" style="padding: 8px 16px; font-size: 0.82rem;" onclick="goHome()">← Back</button>
                 <div>
-                    <h3 id="chat-header-title" style="font-size: 1rem; color: #c77dff;">Ticket Chat</h3>
-                    <span id="chat-header-status" style="font-size: 0.75rem; color: var(--text-muted);">Status: Open</span>
+                    <h3 id="chat-header-title" style="font-size: 1.1rem; color: #c77dff;">Ticket Chat</h3>
+                    <span id="chat-header-status" style="font-size: 0.78rem; color: var(--text-muted);">Status: Open</span>
                 </div>
-                <button id="close-ticket-btn" class="btn btn-danger" style="padding: 6px 14px; font-size: 0.8rem;" onclick="toggleCloseTicket()">Close Ticket</button>
+                <div id="ticket-action-btn-container"></div>
             </div>
 
             <div class="chat-container">
                 <div class="chat-messages" id="chat-messages-box"></div>
                 <div class="quick-replies-bar" id="quick-replies-bar"></div>
-
                 <div class="chat-input-area" id="chat-input-row">
-                    <input type="text" id="chat-message-input" placeholder="Type a message to chat with staff..." onkeypress="if(event.key === 'Enter') sendChatMessage()">
+                    <input type="text" id="chat-message-input" placeholder="Type a message..." onkeypress="if(event.key === 'Enter') sendChatMessage()">
                     <button class="btn" onclick="sendChatMessage()">Send</button>
                 </div>
             </div>
         </div>
     </main>
 
-    <div id="auth-modal" class="modal" onclick="if(event.target === this) closeModal()">
+    <!-- Custom Modal Frame for Handbook Search Results -->
+    <div id="handbook-modal" class="modal" onclick="if(event.target === this) closeHandbookModal()">
         <div class="modal-body">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 id="hb-modal-title" style="color: #c77dff; font-size: 1.15rem;">Guideline Info</h3>
+                <button class="btn btn-danger" style="padding: 3px 10px; font-size: 0.75rem;" onclick="closeHandbookModal()">×</button>
+            </div>
+            <div id="hb-modal-content" style="font-size: 0.9rem; line-height: 1.6; color: #d8d0ef; white-space: pre-line; margin-bottom: 20px;"></div>
+            <button class="btn" style="width: 100%;" onclick="closeHandbookModal()">Close</button>
+        </div>
+    </div>
+
+    <!-- App Review Modal -->
+    <div id="app-review-modal" class="modal" onclick="if(event.target === this) closeAppReviewModal()">
+        <div class="modal-body" style="width: 600px; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+                <h3 style="color: #c77dff; font-size: 1.25rem;">Staff Application Review</h3>
+                <div id="app-status-badge-container"></div>
+            </div>
+            <div id="app-review-content" style="font-size: 0.9rem; line-height: 1.65; color: #d8d0ef; margin-bottom: 24px;"></div>
+            <div id="app-review-actions" style="display: flex; gap: 12px; margin-bottom: 14px;">
+                <button class="btn btn-success" style="flex:1;" onclick="acceptCurrentApplication()">Accept</button>
+                <button class="btn btn-danger" style="flex:1;" onclick="denyCurrentApplication()">Deny</button>
+            </div>
+            <button class="btn btn-secondary" style="width: 100%;" onclick="closeAppReviewModal()">Close</button>
+        </div>
+    </div>
+
+    <!-- Inbox Modal -->
+    <div id="inbox-modal" class="modal" onclick="if(event.target === this) closeInboxModal()">
+        <div class="modal-body" style="width: 520px; max-height: 85vh; display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; border-bottom: 1px solid var(--border-clr); padding-bottom: 12px;">
+                <h3 style="color: #c77dff; font-size: 1.2rem;">📥 Notification Inbox</h3>
+                <button class="btn btn-danger" style="padding: 5px 12px; font-size: 0.78rem;" onclick="clearAllInbox()">Clear All</button>
+            </div>
+            <div id="inbox-messages-list" style="flex: 1; overflow-y: auto; max-height: 380px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px;"></div>
+            <button class="btn btn-secondary" style="width: 100%;" onclick="closeInboxModal()">Close</button>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="modal" onclick="if(event.target === this) closeModal()">
+        <div class="modal-body" id="modal-box-element">
             <div class="modal-tabs">
-                <button class="m-tab active" id="tab-player" onclick="switchAuthMode('player')">Player Code Login</button>
+                <button class="m-tab active" id="tab-player" onclick="switchAuthMode('player')">Player Code</button>
                 <button class="m-tab" id="tab-staff" onclick="switchAuthMode('staff')">Staff Portal</button>
             </div>
 
             <div id="pane-player">
-                <h3 style="font-size: 1.1rem; margin-bottom: 6px;">Minecraft Code Login</h3>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Enter the 8-character code generated from <code>/api create</code> in-game.</p>
-                <label style="font-size: 0.75rem; color: var(--text-muted);">API Code</label>
+                <h3 style="font-size: 1.2rem; margin-bottom: 8px;">Minecraft Code Login</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Enter your 8-character code from <code>/api</code> in-game.</p>
                 <input type="text" id="login-code-input" placeholder="e.g. A9B2X7K1" maxlength="8" style="text-transform: uppercase;">
                 <button class="btn" style="width: 100%;" onclick="submitCodeLogin()">Verify & Enter</button>
             </div>
 
             <div id="pane-staff" class="hidden">
-                <!-- Staff Portal PIN Gate -->
                 <div id="staff-portal-gate">
-                    <h3 style="font-size: 1.1rem; margin-bottom: 6px;">Staff Portal Security</h3>
-                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Enter the 4-digit staff portal access PIN to proceed.<code></code>)</p>
-                    <label style="font-size: 0.75rem; color: var(--text-muted);">Portal Access PIN</label>
-                    <input type="password" id="staff-portal-pin" placeholder="••••" maxlength="4" inputmode="numeric" style="letter-spacing: 4px; text-align: center; font-weight: bold;">
-                    <button class="btn" style="width: 100%;" onclick="verifyStaffPortalPin()">Unlock Portal</button>
+                    <h3 style="font-size: 1.2rem; margin-bottom: 8px;">Staff Portal Security</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Enter portal PIN to proceed.</p>
+                    <input type="password" id="staff-portal-pin" placeholder="••••" maxlength="4" style="text-align: center; font-weight: bold; font-size: 1.3rem;">
+                    <button class="btn" style="width: 100%;" onclick="verifyStaffPortalPin()">Unlock</button>
                 </div>
 
-                <!-- Staff Login & Signup Container (Unlocked After PIN) -->
                 <div id="staff-portal-content" class="hidden">
-                    <div style="display: flex; gap: 5px; margin-bottom: 12px;">
-                        <button class="btn btn-secondary" id="staff-subtab-in" style="flex:1; font-size:0.75rem; padding:6px;" onclick="switchStaffSub('in')">Staff Login</button>
-                        <button class="btn btn-secondary" id="staff-subtab-up" style="flex:1; font-size:0.75rem; padding:6px;" onclick="switchStaffSub('up')">Staff Signup</button>
+                    <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                        <button class="btn btn-secondary" id="staff-subtab-in" style="flex:1; font-size:0.78rem; padding:8px;" onclick="switchStaffSub('in')">Login</button>
+                        <button class="btn btn-secondary" id="staff-subtab-up" style="flex:1; font-size:0.78rem; padding:8px;" onclick="switchStaffSub('up')">Signup</button>
                     </div>
-
                     <div id="staff-pane-in">
-                        <h3 style="font-size: 1.05rem; margin-bottom: 4px;">Staff Login</h3>
-                        <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px;">Restricted to approved staff members.</p>
-                        <label style="font-size: 0.72rem; color: var(--text-muted);">Staff API Code</label>
-                        <input type="text" id="staff-login-code" placeholder="8-char API code" maxlength="8" style="text-transform: uppercase;">
-                        <label style="font-size: 0.72rem; color: var(--text-muted);">Account PIN</label>
-                        <input type="password" id="staff-login-pin" placeholder="••••" maxlength="4" inputmode="numeric" style="letter-spacing: 4px; text-align: center; font-weight: bold;">
-                        <button class="btn" style="width: 100%;" onclick="submitStaffLogin()">Staff Sign In</button>
+                        <label>Staff API Code</label><input type="text" id="staff-login-code" maxlength="8" style="text-transform: uppercase;">
+                        <label>Account PIN</label><input type="password" id="staff-login-pin" maxlength="4">
+                        <button class="btn" style="width: 100%;" onclick="submitStaffLogin()">Sign In</button>
                     </div>
-
                     <div id="staff-pane-up" class="hidden">
-                        <h3 style="font-size: 1.05rem; margin-bottom: 4px;">Staff Signup</h3>
-                        <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px;">Authorized: Clockwrx, Zanecpvp, Prolegoboy, swordgodd</p>
-                        <label style="font-size: 0.72rem; color: var(--text-muted);">Minecraft Username</label>
-                        <input type="text" id="staff-reg-user" placeholder="Enter username...">
-                        <label style="font-size: 0.72rem; color: var(--text-muted);">Staff API Code</label>
-                        <input type="text" id="staff-reg-code" placeholder="8-char API code" maxlength="8" style="text-transform: uppercase;">
-                        <label style="font-size: 0.72rem; color: var(--text-muted);">Create Account PIN (4 Digits)</label>
-                        <input type="password" id="staff-reg-pin" placeholder="••••" maxlength="4" inputmode="numeric" style="letter-spacing: 4px; text-align: center; font-weight: bold;">
-                        <button class="btn" style="width: 100%;" onclick="submitStaffRegister()">Create Staff Account</button>
+                        <label>Minecraft Username</label><input type="text" id="staff-reg-user">
+                        <label>Staff API Code</label><input type="text" id="staff-reg-code" maxlength="8" style="text-transform: uppercase;">
+                        <label>Create PIN (4 Digits)</label><input type="password" id="staff-reg-pin" maxlength="4">
+                        <button class="btn" style="width: 100%;" onclick="submitStaffRegister()">Register</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <div id="easter-egg-banner">🌟 SECRET EASTER EGG UNLOCKED: Rainbow Matrix Mode!</div>
+
     <script>
+        // Generate ambient floating particles dynamically
+        const particleContainer = document.getElementById('particles-container');
+        for (let i = 0; i < 24; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            const size = Math.random() * 5 + 2;
+            p.style.width = size + 'px';
+            p.style.height = size + 'px';
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.top = (Math.random() * 20 + 100) + 'vh';
+            p.style.animationDuration = (Math.random() * 5 + 5) + 's';
+            p.style.animationDelay = (Math.random() * 5) + 's';
+            particleContainer.appendChild(p);
+        }
+
+        // --- SIMPLIFIED HANDBOOK DATABASE FROM SOURCE PDFS ---
+        const handbookDatabase = [
+            { 
+                title: "Staff Philosophy & Core Rules", 
+                category: "Code of Conduct", 
+                content: "• Suspicion is NOT proof[cite: 1, 2]. A skilled player is not automatically cheating[cite: 1].\n• Core values include respect, honesty, fairness, and professionalism[cite: 2].\n• Never abuse staff powers or permissions for personal advantage[cite: 2]." 
+            },
+            { 
+                title: "Investigation Protocols & Freezing", 
+                category: "Investigation Handbook", 
+                content: "• Use vanish or spectator mode and observe naturally[cite: 1]. Never announce investigations in chat[cite: 1, 3].\n• Always check player ping and server TPS before acting to prevent false positives[cite: 1, 3].\n• Freeze players only when substantial evidence requires further investigation[cite: 1]." 
+            },
+            { 
+                title: "Tier 1 Punishments: Minor Offenses", 
+                category: "Punishment Guide", 
+                content: "• Chat spam, minor griefing, stealing[cite: 3].\n• Punishment: 15m mute up to 3d ban[cite: 3]. Requires chat logs or CoreProtect logs[cite: 3]." 
+            },
+            { 
+                title: "Tier 2 Punishments: Moderate Offenses", 
+                category: "Punishment Guide", 
+                content: "• Toxicity, chat advertising, X-Ray, auto-clicker (>15 CPS)[cite: 3].\n• Punishment: 6h mute up to 7d ban[cite: 3]. Requires anti-cheat logs or video[cite: 3]." 
+            },
+            { 
+                title: "Tier 3 Punishments: Severe Violations", 
+                category: "Punishment Guide", 
+                content: "• KillAura, Fly, Speed, Reach, hate speech, item duping[cite: 3].\n• Punishment: 3d ban up to 30d ban[cite: 3]. Requires unedited 30s+ video clip verifying ping and TPS[cite: 3]." 
+            },
+            { 
+                title: "Tier 4 Punishments: Critical Offenses", 
+                category: "Punishment Guide", 
+                content: "• DDoS threats, doxxing, server crash exploits, ban evading[cite: 3].\n• Punishment: Permanent ban[cite: 3]." 
+            }
+        ];
+
+        function handleSearchInput(val) {
+            const dropdown = document.getElementById('search-results-dropdown');
+            const query = val.toLowerCase().trim();
+            if (!query) { dropdown.style.display = 'none'; dropdown.innerHTML = ''; return; }
+
+            const matches = handbookDatabase.filter(item => 
+                item.title.toLowerCase().includes(query) || 
+                item.category.toLowerCase().includes(query) || 
+                item.content.toLowerCase().includes(query)
+            );
+
+            if (matches.length === 0) {
+                dropdown.style.display = 'block';
+                dropdown.innerHTML = `<div style="padding: 10px; color: var(--text-muted); font-size: 0.85rem; text-align: center;">No matching guidelines found.</div>`;
+                return;
+            }
+
+            dropdown.style.display = 'block';
+            dropdown.innerHTML = '';
+            matches.forEach(m => {
+                dropdown.innerHTML += `
+                    <div class="search-result-item" onclick="openHandbookResult('${m.title.replace(/'/g, "\\'")}', '${m.content.replace(/'/g, "\\'").replace(/\n/g, '\\n')}')">
+                        <h5 style="color:#c77dff; font-size:0.9rem; margin-bottom:2px;">${m.title}</h5>
+                        <p style="color:var(--text-muted); font-size:0.76rem; margin:0;"><b>[${m.category}]</b> — Click to view protocol</p>
+                    </div>
+                `;
+            });
+        }
+
+        function openHandbookResult(title, content) {
+            document.getElementById('hb-modal-title').innerText = title;
+            document.getElementById('hb-modal-content').innerText = content.replace(/\\n/g, '\n');
+            document.getElementById('handbook-modal').classList.add('active');
+            document.getElementById('search-results-dropdown').style.display = 'none';
+            document.getElementById('main-search-input').value = "";
+        }
+
+        function closeHandbookModal() {
+            document.getElementById('handbook-modal').classList.remove('active');
+        }
+
+        // --- FIREBASE CONFIG & APP LOGIC ---
         const firebaseConfig = {
             apiKey: "AIzaSyAcKzlLnxLbZzykhzVrGt-lc24FKd-M3HE",
             authDomain: "dupesmp-support.firebaseapp.com",
@@ -717,52 +1022,129 @@
         const db = firebase.database();
 
         const allowedStaffNames = ["CLOCKWRX", "ZANECPVP", "PROLEGOBOY", "SWORDGODD"];
-        const STAFF_PORTAL_PIN = "4456"; // Master PIN to unlock the staff portal screens
+        const STAFF_PORTAL_PIN = "4456";
 
         let currentSession = null; 
         let selectedPlatform = "Java";
         let activeTicketId = null;
         let ticketsDatabase = [];
+        let applicationsDatabase = [];
         let profilesDatabase = {};
         let staffDatabase = {};
+        let inboxDatabase = {};
+        let activeReviewAppIndex = null;
 
-        // Real-time Cloud Listeners
+        function playNotificationSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+                gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+                osc.connect(gain); gain.connect(ctx.destination);
+                osc.start(); osc.stop(ctx.currentTime + 0.3);
+            } catch(e) {}
+        }
+
+        let logoClickCount = 0;
+        function handleLogoClick() {
+            logoClickCount++;
+            if (logoClickCount === 5) {
+                document.body.classList.toggle('rainbow-mode');
+                const banner = document.getElementById('easter-egg-banner');
+                banner.style.display = "block";
+                setTimeout(() => { banner.style.display = "none"; }, 3500);
+                logoClickCount = 0;
+            }
+        }
+
         db.ref('tickets').on('value', (snapshot) => {
             ticketsDatabase = snapshot.val() || [];
-            if (currentSession && document.getElementById('view-home').classList.contains('hidden') === false) {
-                renderTicketsDashboard();
-            }
-            if (activeTicketId !== null) {
-                renderChatMessages();
-            }
+            if (currentSession && !document.getElementById('view-home').classList.contains('hidden')) renderTicketsDashboard();
+            if (activeTicketId !== null) renderChatMessages();
         });
 
-        db.ref('profiles').on('value', (snapshot) => {
-            profilesDatabase = snapshot.val() || {};
+        db.ref('applications').on('value', (snapshot) => {
+            applicationsDatabase = snapshot.val() || [];
+            if (currentSession && !document.getElementById('view-applications').classList.contains('hidden')) renderUserApplicationsList();
         });
 
-        db.ref('staff').on('value', (snapshot) => {
-            staffDatabase = snapshot.val() || {};
+        db.ref('profiles').on('value', (snapshot) => { profilesDatabase = snapshot.val() || {}; });
+        db.ref('staff').on('value', (snapshot) => { staffDatabase = snapshot.val() || {}; });
+        db.ref('inbox').on('value', (snapshot) => {
+            inboxDatabase = snapshot.val() || {};
+            if (currentSession) updateInboxBadge();
         });
+
+        function pushInboxMessage(targetCode, messageText) {
+            if (!inboxDatabase[targetCode]) inboxDatabase[targetCode] = [];
+            inboxDatabase[targetCode].push({
+                id: Date.now() + Math.random(),
+                text: messageText,
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            });
+            db.ref('inbox').set(inboxDatabase);
+        }
+
+        function updateInboxBadge() {
+            if (!currentSession) return;
+            let userMsgs = inboxDatabase[currentSession.identifier] || [];
+            const badge = document.getElementById('inbox-unread-badge');
+            if (badge) {
+                if (userMsgs.length > 0) {
+                    badge.innerText = userMsgs.length;
+                    badge.style.display = "inline-block";
+                } else {
+                    badge.style.display = "none";
+                }
+            }
+        }
+
+        function openInboxModal() {
+            document.getElementById('inbox-modal').classList.add('active');
+            const listContainer = document.getElementById('inbox-messages-list');
+            listContainer.innerHTML = "";
+            let userMsgs = inboxDatabase[currentSession.identifier] || [];
+            if (userMsgs.length === 0) {
+                listContainer.innerHTML = `<p style="color:var(--text-muted); text-align:center; padding: 25px;">Your inbox is empty.</p>`;
+                return;
+            }
+            userMsgs.forEach((msg, idx) => {
+                listContainer.innerHTML += `
+                    <div style="background:rgba(9, 7, 15, 0.9); border:1px solid var(--border-clr); padding:14px; border-radius:10px; display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
+                        <div><p style="font-size:0.9rem; color:#d8d0ef; line-height:1.45;">${msg.text}</p><span style="font-size:0.72rem; color:var(--text-muted);">${msg.timestamp}</span></div>
+                        <button class="btn btn-danger" style="padding: 3px 9px; font-size: 0.75rem;" onclick="deleteInboxItem(${idx})">×</button>
+                    </div>`;
+            });
+            playNotificationSound();
+        }
+
+        function closeInboxModal() { document.getElementById('inbox-modal').classList.remove('active'); }
+        function deleteInboxItem(idx) {
+            let userMsgs = inboxDatabase[currentSession.identifier] || [];
+            userMsgs.splice(idx, 1);
+            db.ref('inbox/' + currentSession.identifier).set(userMsgs, () => openInboxModal());
+        }
+        function clearAllInbox() {
+            db.ref('inbox/' + currentSession.identifier).set([], () => openInboxModal());
+        }
 
         function openModal(mode) {
             document.getElementById('auth-modal').classList.add('active');
-            if(mode === 'staff') {
-                switchAuthMode('staff');
-            } else {
-                switchAuthMode('player');
-            }
+            switchAuthMode(mode === 'staff' ? 'staff' : 'player');
         }
-        function closeModal() { 
+
+        function closeModal() {
             document.getElementById('auth-modal').classList.remove('active');
-            // Reset portal gate when closing
             document.getElementById('staff-portal-gate').classList.remove('hidden');
             document.getElementById('staff-portal-content').classList.add('hidden');
             document.getElementById('staff-portal-pin').value = "";
         }
 
         function switchAuthMode(mode) {
-            if(mode === 'player') {
+            if (mode === 'player') {
                 document.getElementById('tab-player').classList.add('active');
                 document.getElementById('tab-staff').classList.remove('active');
                 document.getElementById('pane-player').classList.remove('hidden');
@@ -772,28 +1154,18 @@
                 document.getElementById('tab-player').classList.remove('active');
                 document.getElementById('pane-staff').classList.remove('hidden');
                 document.getElementById('pane-player').classList.add('hidden');
-                
-                // Reset to lock gate every time staff tab is clicked
-                document.getElementById('staff-portal-gate').classList.remove('hidden');
-                document.getElementById('staff-portal-content').classList.add('hidden');
-                document.getElementById('staff-portal-pin').value = "";
             }
         }
 
         function verifyStaffPortalPin() {
-            const enteredPin = document.getElementById('staff-portal-pin').value.trim();
-            if (enteredPin !== STAFF_PORTAL_PIN) {
-                return alert("Incorrect Staff Portal PIN!");
-            }
-
-            // Hide gate and show staff login/signup screens
+            if (document.getElementById('staff-portal-pin').value.trim() !== STAFF_PORTAL_PIN) return alert("Incorrect PIN!");
             document.getElementById('staff-portal-gate').classList.add('hidden');
             document.getElementById('staff-portal-content').classList.remove('hidden');
             switchStaffSub('in');
         }
 
         function switchStaffSub(sub) {
-            if(sub === 'in') {
+            if (sub === 'in') {
                 document.getElementById('staff-subtab-in').classList.add('active');
                 document.getElementById('staff-subtab-up').classList.remove('active');
                 document.getElementById('staff-pane-in').classList.remove('hidden');
@@ -808,58 +1180,36 @@
 
         function submitCodeLogin() {
             const code = document.getElementById('login-code-input').value.trim().toUpperCase();
-            if (!code || code.length !== 8) return alert("Please enter a valid 8-character code.");
-
+            if (!code || code.length !== 8) return alert("Enter valid 8-character code.");
             currentSession = { identifier: code, name: code, isStaff: false };
             closeModal();
             updateUIAfterLogin();
+            playNotificationSound();
         }
 
         function submitStaffLogin() {
             const code = document.getElementById('staff-login-code').value.trim().toUpperCase();
             const pin = document.getElementById('staff-login-pin').value.trim();
-            if (!code || code.length !== 8 || !pin || pin.length !== 4) {
-                return alert("Please provide your 8-character API code and a valid 4-digit PIN.");
-            }
-
-            let foundStaffName = null;
+            let found = null;
             for (let name in staffDatabase) {
-                if (staffDatabase[name].code === code && staffDatabase[name].pin === pin) {
-                    foundStaffName = name;
-                    break;
-                }
+                if (staffDatabase[name].code === code && staffDatabase[name].pin === pin) found = name;
             }
-
-            if (!foundStaffName) {
-                return alert("Invalid staff API code or account PIN.");
-            }
-
-            currentSession = { identifier: code, name: foundStaffName, isStaff: true };
+            if (!found) return alert("Invalid staff credentials.");
+            currentSession = { identifier: code, name: found, isStaff: true };
             closeModal();
             updateUIAfterLogin();
+            playNotificationSound();
         }
 
         function submitStaffRegister() {
-            const username = document.getElementById('staff-reg-user').value.trim();
+            const user = document.getElementById('staff-reg-user').value.trim().toUpperCase();
             const code = document.getElementById('staff-reg-code').value.trim().toUpperCase();
             const pin = document.getElementById('staff-reg-pin').value.trim();
-            
-            if (!username || !code || code.length !== 8 || !pin || pin.length !== 4 || isNaN(pin)) {
-                return alert("Please fill out all fields correctly (Code must be 8 chars, PIN must be exactly 4 numbers).");
-            }
-
-            if (!allowedStaffNames.includes(username.toUpperCase())) {
-                return alert("Registration Failed: Only Clockwrx, Zanecpvp, Prolegoboy, or swordgodd can hold staff accounts.");
-            }
-
-            db.ref('staff/' + username.toUpperCase()).set({ code: code, pin: pin }, (error) => {
-                if (error) {
-                    alert("Registration failed: " + error.message);
-                } else {
-                    alert("Staff account created successfully!");
-                    switchStaffSub('in');
-                    document.getElementById('staff-login-code').value = code;
-                }
+            if (!allowedStaffNames.includes(user)) return alert("Not authorized for staff registration.");
+            db.ref('staff/' + user).set({ code: code, pin: pin }, () => {
+                alert("Staff account created!");
+                switchStaffSub('in');
+                document.getElementById('staff-login-code').value = code;
             });
         }
 
@@ -871,63 +1221,22 @@
 
         function updateUIAfterLogin() {
             const nav = document.getElementById('header-nav');
-            const dashboardSection = document.getElementById('ticket-dashboard-section');
-
+            const dash = document.getElementById('ticket-dashboard-section');
             if (!currentSession) {
                 nav.innerHTML = `<button class="btn btn-secondary" onclick="openModal('player')">Login</button>`;
-                dashboardSection.classList.add('hidden');
+                dash.classList.add('hidden');
             } else {
-                let staffControlsHtml = '';
-                if (currentSession.isStaff) {
-                    staffControlsHtml = `
-                        <div class="staff-panel-wrapper">
-                            <button class="btn" onclick="toggleStaffPanel()" style="background:#7b2cbf;">Staff Panel ⚙️</button>
-                            <div id="staff-dropdown-frame" class="staff-dropdown-frame hidden">
-                                <h3>Staff Control Panel</h3>
-                                
-                                <div style="margin-bottom: 14px;">
-                                    <label style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Look up API Key / Code</label>
-                                    <div style="display: flex; gap: 6px;">
-                                        <input type="text" id="staff-lookup-code" placeholder="Enter API Code..." style="flex:1; padding: 8px; background: #0d0a14; border: 1px solid var(--border-clr); border-radius: 6px; color: white; font-size: 0.8rem; text-transform: uppercase;">
-                                        <button class="btn" style="padding: 8px 12px; font-size: 0.75rem;" onclick="lookupApiKey()">Lookup</button>
-                                    </div>
-                                    <div id="lookup-result" style="font-size: 0.75rem; color: #c77dff; margin-top: 6px;"></div>
-                                </div>
-
-                                <div style="margin-bottom: 14px; border-top: 1px solid var(--border-clr); padding-top: 12px;">
-                                    <label style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Admin: Open Ticket for Player</label>
-                                    <input type="text" id="admin-target-code" placeholder="Player API Code" style="width: 100%; padding: 8px; background: #0d0a14; border: 1px solid var(--border-clr); border-radius: 6px; color: white; font-size: 0.8rem; margin-bottom: 6px; text-transform: uppercase;">
-                                    <select id="admin-ticket-cat" style="width: 100%; padding: 8px; background: #0d0a14; border: 1px solid var(--border-clr); border-radius: 6px; color: white; font-size: 0.8rem; margin-bottom: 8px;">
-                                        <option value="General Support">General Support</option>
-                                        <option value="Purchase support">Purchase support</option>
-                                        <option value="Bug support">Bug support</option>
-                                        <option value="Media application">Media application</option>
-                                        <option value="Ban appeal">Ban appeal</option>
-                                        <option value="Player report">Player report</option>
-                                    </select>
-                                    <button class="btn" style="width: 100%; padding: 8px; font-size: 0.78rem;" onclick="adminOpenTicket()">Create & Open Ticket</button>
-                                </div>
-
-                                <div style="border-top: 1px solid var(--border-clr); padding-top: 12px;">
-                                    <label style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 6px;">Account Database (Profiles & PINs)</label>
-                                    <div style="max-height: 140px; overflow-y: auto;">
-                                        <table class="staff-db-table" id="staff-database-table">
-                                            <tr><th>User / Code</th><th>Details / PIN</th></tr>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
-
+                let staffHtml = currentSession.isStaff ? `<div class="staff-panel-wrapper"><button class="btn" onclick="toggleStaffPanel()">Staff Panel ⚙️</button><div id="staff-dropdown-frame" class="staff-dropdown-frame hidden"><h3>Staff Control Panel</h3><div style="max-height:160px; overflow-y:auto;"><table class="staff-db-table" id="staff-db-table"><tr><th>User</th><th>Code</th></tr></table></div></div></div>` : '';
                 nav.innerHTML = `
-                    ${staffControlsHtml}
-                    <button class="btn btn-secondary" onclick="goProfile()" style="padding: 6px 14px; font-size:0.8rem;">Profile</button>
-                    <button class="btn btn-danger" onclick="logoutUser()" style="padding: 6px 14px; font-size:0.8rem;">Log Out</button>
+                    ${staffHtml}
+                    <button class="btn btn-secondary" onclick="goApplications()">Applications 📄</button>
+                    <button class="btn btn-secondary" onclick="openInboxModal()" style="position:relative;">Inbox 📥 <span id="inbox-unread-badge" class="unread-badge" style="display:none; position:absolute; top:-5px; right:-5px;">0</span></button>
+                    <button class="btn btn-secondary" onclick="goProfile()">Profile</button>
+                    <button class="btn btn-danger" onclick="logoutUser()">Log Out</button>
                 `;
-                dashboardSection.classList.remove('hidden');
+                dash.classList.remove('hidden');
                 renderTicketsDashboard();
+                updateInboxBadge();
             }
         }
 
@@ -935,444 +1244,185 @@
             const panel = document.getElementById('staff-dropdown-frame');
             panel.classList.toggle('hidden');
             if (!panel.classList.contains('hidden')) {
-                renderStaffDatabaseTable();
-            }
-        }
-
-        function lookupApiKey() {
-            const code = document.getElementById('staff-lookup-code').value.trim().toUpperCase();
-            const resBox = document.getElementById('lookup-result');
-            if (!code) {
-                resBox.innerText = "Please enter a code to lookup.";
-                return;
-            }
-
-            let pData = profilesDatabase[code];
-            let isStaffMatch = "No";
-            for(let name in staffDatabase) {
-                if(staffDatabase[name].code === code) isStaffMatch = "Yes (" + name + ")";
-            }
-
-            if (pData || isStaffMatch !== "No") {
-                let ign = pData ? pData.ign : "Staff Account";
-                let platform = pData ? (pData.platform || 'N/A') : "N/A";
-                let yt = pData ? (pData.yt || 'None') : 'None';
-                let twitch = pData ? (pData.twitch || 'None') : 'None';
-                let tiktok = pData ? (pData.tiktok || 'None') : 'None';
-
-                resBox.innerHTML = `Found! IGN/User: <b>${ign}</b><br>` +
-                                   `Platform: <b>${platform}</b> | Staff: <b>${isStaffMatch}</b><br>` +
-                                   `YouTube: <a href="${yt}" target="_blank" style="color:#c77dff;">${yt}</a><br>` +
-                                   `Twitch: <a href="${twitch}" target="_blank" style="color:#c77dff;">${twitch}</a><br>` +
-                                   `TikTok: <a href="${tiktok}" target="_blank" style="color:#c77dff;">${tiktok}</a>`;
-            } else {
-                resBox.innerText = "No records found for code: " + code;
-            }
-        }
-
-        function adminOpenTicket() {
-            const code = document.getElementById('admin-target-code').value.trim().toUpperCase();
-            const category = document.getElementById('admin-ticket-cat').value;
-
-            if (!code || code.length !== 8) {
-                alert("Please enter a valid 8-character player API code.");
-                return;
-            }
-
-            let pData = profilesDatabase[code] || { ign: "Player_" + code };
-
-            let initialMessages = [
-                { sender: "DupeSMP Bot", text: `Welcome to DupeSMP Support! Ticket opened under category: ${category}. Provide your username and platform to get the conversation started.` }
-            ];
-
-            const newTicket = {
-                id: ticketsDatabase.length > 0 ? ticketsDatabase.length + 1 : 1,
-                code: code,
-                ign: pData.ign,
-                category: category,
-                status: "Open",
-                unreadCounts: { player: 0, staff: 0 },
-                messages: initialMessages
-            };
-
-            ticketsDatabase.push(newTicket);
-            db.ref('tickets').set(ticketsDatabase, (error) => {
-                if (error) {
-                    alert("Error opening ticket: " + error.message);
-                } else {
-                    alert(`Ticket #${newTicket.id} successfully created for ${pData.ign} under ${category}!`);
-                    toggleStaffPanel();
-                    renderTicketsDashboard();
+                const table = document.getElementById('staff-db-table');
+                table.innerHTML = `<tr><th>User</th><th>Code</th></tr>`;
+                for (let name in staffDatabase) {
+                    table.innerHTML += `<tr><td>${name}</td><td>${staffDatabase[name].code}</td></tr>`;
                 }
-            });
-        }
-
-        function renderStaffDatabaseTable() {
-            const table = document.getElementById('staff-database-table');
-            table.innerHTML = `<tr><th>User / Code</th><th>Details / PIN</th></tr>`;
-
-            for (let name in staffDatabase) {
-                table.innerHTML += `<tr><td>${name} (Staff)</td><td>Code: ${staffDatabase[name].code} | PIN: ${staffDatabase[name].pin}</td></tr>`;
-            }
-
-            for (let code in profilesDatabase) {
-                let p = profilesDatabase[code];
-                table.innerHTML += `<tr><td>Code: ${code}</td><td>IGN: ${p.ign} | YT: ${p.yt ? 'Linked' : 'None'}</td></tr>`;
             }
         }
 
-        function setPlatform(plat) {
-            selectedPlatform = plat;
-            ['Java', 'Bedrock', 'Both'].forEach(p => {
-                document.getElementById('p-' + p.toLowerCase()).classList.remove('active');
-            });
-            document.getElementById('p-' + plat.toLowerCase()).classList.add('active');
+        function setPlatform(p) {
+            selectedPlatform = p;
+            ['Java', 'Bedrock', 'Both'].forEach(x => document.getElementById('p-' + x.toLowerCase()).classList.remove('active'));
+            document.getElementById('p-' + p.toLowerCase()).classList.add('active');
         }
 
         function autoFillProfileSettings() {
-            const mockIGNs = ["DupeKing99", "ShadowPvP", "CraftMaster", "VoidWalker", "DiamondMiner"];
-            const randomIGN = currentSession.isStaff ? currentSession.name : mockIGNs[Math.floor(Math.random() * mockIGNs.length)];
-            const platforms = ["Java", "Bedrock", "Both"];
-            const randomPlatform = platforms[Math.floor(Math.random() * platforms.length)];
-
-            document.getElementById('prof-ign').value = randomIGN;
+            document.getElementById('prof-ign').value = currentSession.isStaff ? currentSession.name : "DupeKing99";
             document.getElementById('prof-disc').value = "dupegod_" + currentSession.identifier.toLowerCase();
-            document.getElementById('prof-version').value = "1.21.11";
-            document.getElementById('prof-yt').value = "https://youtube.com/@" + randomIGN.toLowerCase();
-            document.getElementById('prof-twitch').value = "https://twitch.tv/" + randomIGN.toLowerCase();
-            document.getElementById('prof-tiktok').value = "https://tiktok.com/@" + randomIGN.toLowerCase();
-            setPlatform(randomPlatform);
-            
-            alert("Profile settings auto-filled successfully!");
+            document.getElementById('prof-version').value = "1.21.4";
+            document.getElementById('prof-yt').value = "https://youtube.com/@dupesmp";
+            alert("Auto-filled profile!");
         }
 
         function saveProfile() {
-            const ign = document.getElementById('prof-ign').value.trim();
-            const disc = document.getElementById('prof-disc').value.trim();
-            const version = document.getElementById('prof-version').value.trim();
-            const yt = document.getElementById('prof-yt').value.trim();
-            const twitch = document.getElementById('prof-twitch').value.trim();
-            const tiktok = document.getElementById('prof-tiktok').value.trim();
-
-            if (!ign) return alert("Please enter your Minecraft IGN.");
-
-            let profileData = { ign: ign, disc: disc, version: version, platform: selectedPlatform, yt: yt, twitch: twitch, tiktok: tiktok };
-            
-            db.ref('profiles/' + currentSession.identifier).set(profileData, (error) => {
-                if (error) {
-                    alert("Error saving profile: " + error.message);
-                } else {
-                    alert("Profile saved successfully to cloud!");
-                    goHome();
-                }
+            const data = {
+                ign: document.getElementById('prof-ign').value.trim(),
+                disc: document.getElementById('prof-disc').value.trim(),
+                version: document.getElementById('prof-version').value.trim(),
+                platform: selectedPlatform,
+                yt: document.getElementById('prof-yt').value.trim(),
+                twitch: document.getElementById('prof-twitch').value.trim(),
+                tiktok: document.getElementById('prof-tiktok').value.trim()
+            };
+            db.ref('profiles/' + currentSession.identifier).set(data, () => {
+                alert("Profile saved successfully!");
+                goHome();
             });
         }
 
-        function createNewTicket(category) {
-            if (!currentSession) {
-                alert("Please log in first.");
-                openModal('player');
+        function goApplications() {
+            if (!currentSession) return openModal('player');
+            hideAllViews();
+            document.getElementById('view-applications').classList.remove('hidden');
+            renderUserApplicationsList();
+        }
+
+        function renderUserApplicationsList() {
+            const container = document.getElementById('user-applications-list-container');
+            container.innerHTML = "";
+            const apps = (applicationsDatabase || []).filter(a => currentSession.isStaff || a.code === currentSession.identifier);
+            if (apps.length === 0) {
+                container.innerHTML = `<p style="color:var(--text-muted); text-align:center; padding:20px;">No applications submitted.</p>`;
                 return;
             }
-
-            let pData = profilesDatabase[currentSession.identifier] || { ign: currentSession.isStaff ? currentSession.name : "Player" };
-            
-            let initialMessages = [
-                { sender: "DupeSMP Bot", text: `Welcome to DupeSMP Support! Ticket opened under category: ${category}. Provide your username and platform to get the conversation started.` }
-            ];
-
-            const newTicket = {
-                id: ticketsDatabase.length > 0 ? ticketsDatabase.length + 1 : 1,
-                code: currentSession.identifier,
-                ign: pData.ign,
-                category: category,
-                status: "Open",
-                unreadCounts: { player: 0, staff: 0 },
-                messages: initialMessages
-            };
-
-            ticketsDatabase.push(newTicket);
-            db.ref('tickets').set(ticketsDatabase, () => {
-                openChatView(newTicket.id);
+            apps.forEach((app, idx) => {
+                container.innerHTML += `
+                    <div class="app-box">
+                        <div><strong>⭐ Staff Application</strong> (IGN: ${app.ign})<p style="font-size:0.8rem; color:var(--text-muted);">Status: ${app.status}</p></div>
+                        <button class="btn" onclick="reviewApp(${idx})">View</button>
+                    </div>`;
             });
+        }
+
+        function openStaffApplicationForm() {
+            if (!currentSession) return openModal('player');
+            hideAllViews();
+            document.getElementById('view-app-form').classList.remove('hidden');
+        }
+
+        function submitStaffApplicationForm() {
+            const app = {
+                code: currentSession.identifier,
+                ign: document.getElementById('app-ign').value.trim(),
+                discord: document.getElementById('app-discord').value.trim(),
+                age: document.getElementById('app-age').value.trim(),
+                timezone: document.getElementById('app-tz').value.trim(),
+                hours: document.getElementById('app-hours').value.trim(),
+                pvpLevel: document.getElementById('app-pvp-level').value,
+                bans: document.getElementById('app-bans').value.trim(),
+                experience: document.getElementById('app-exp').value.trim(),
+                scenarioDupe: document.getElementById('app-scenario-dupe').value.trim(),
+                scenarioChat: document.getElementById('app-scenario-chat').value.trim(),
+                strengthsWeaknesses: document.getElementById('app-strengths-weaknesses').value.trim(),
+                why: document.getElementById('app-why').value.trim(),
+                status: "PENDING",
+                timestamp: new Date().toLocaleString()
+            };
+            let apps = applicationsDatabase || [];
+            apps.push(app);
+            db.ref('applications').set(apps, () => {
+                alert("Application submitted!");
+                goApplications();
+            });
+        }
+
+        function reviewApp(idx) {
+            activeReviewAppIndex = idx;
+            let app = applicationsDatabase[idx];
+            document.getElementById('app-review-content').innerHTML = `<p><b>IGN:</b> ${app.ign}</p><p><b>Discord:</b> ${app.discord}</p><p><b>Why:</b> ${app.why}</p>`;
+            document.getElementById('app-review-actions').style.display = currentSession.isStaff ? "flex" : "none";
+            document.getElementById('app-review-modal').classList.add('active');
+        }
+
+        function acceptCurrentApplication() {
+            applicationsDatabase[activeReviewAppIndex].status = "ACCEPTED";
+            db.ref('applications').set(applicationsDatabase, () => {
+                pushInboxMessage(applicationsDatabase[activeReviewAppIndex].code, "🎉 Your staff application was ACCEPTED!");
+                alert("Application accepted!");
+                closeAppReviewModal();
+            });
+        }
+
+        function denyCurrentApplication() {
+            applicationsDatabase[activeReviewAppIndex].status = "DENIED";
+            db.ref('applications').set(applicationsDatabase, () => {
+                pushInboxMessage(applicationsDatabase[activeReviewAppIndex].code, "❌ Your staff application was denied.");
+                alert("Application denied.");
+                closeAppReviewModal();
+            });
+        }
+
+        function closeAppReviewModal() { document.getElementById('app-review-modal').classList.remove('active'); }
+
+        function createNewTicket(cat) {
+            if (!currentSession) return openModal('player');
+            const ticket = {
+                id: ticketsDatabase.length + 1,
+                code: currentSession.identifier,
+                ign: profilesDatabase[currentSession.identifier]?.ign || currentSession.identifier,
+                category: cat,
+                status: "Open",
+                messages: [{ sender: "DupeSMP Bot", text: `Welcome! Ticket opened under ${cat}. Provide your details.` }]
+            };
+            ticketsDatabase.push(ticket);
+            db.ref('tickets').set(ticketsDatabase, () => openChatView(ticket.id));
         }
 
         function renderTicketsDashboard() {
-            const openedContainer = document.getElementById('opened-tickets-container');
-            const closedContainer = document.getElementById('closed-tickets-container');
-            
-            openedContainer.innerHTML = "";
-            closedContainer.innerHTML = "";
+            const opened = document.getElementById('opened-tickets-container');
+            const closed = document.getElementById('closed-tickets-container');
+            opened.innerHTML = ""; closed.innerHTML = "";
+            const mine = ticketsDatabase.filter(t => currentSession.isStaff || t.code === currentSession.identifier);
 
-            const visibleTickets = ticketsDatabase.filter(t => currentSession.isStaff || t.code === currentSession.identifier);
-
-            const openList = visibleTickets.filter(t => t.status === "Open");
-            const closedList = visibleTickets.filter(t => t.status === "Closed");
-
-            if (openList.length === 0) {
-                openedContainer.innerHTML = `<p style="color:var(--text-muted); font-size:0.85rem; padding:10px 0;">No active opened tickets.</p>`;
-            } else {
-                openList.forEach(t => {
-                    let unreadCount = currentSession.isStaff ? (t.unreadCounts ? t.unreadCounts.staff : 0) : (t.unreadCounts ? t.unreadCounts.player : 0);
-                    let badgeHtml = unreadCount > 0 ? `<span class="unread-badge">${unreadCount}</span>` : '';
-
-                    openedContainer.innerHTML += `
-                        <div class="ticket-list-item">
-                            <div>
-                                <strong>#${t.id} - ${t.category}</strong> <span style="color:var(--text-muted); font-size:0.8rem;">(IGN: ${t.ign})</span>
-                                ${badgeHtml}
-                                <p style="font-size:0.8rem; color:#d8d0ef; margin-top:2px;">Status: Active Support Chat</p>
-                            </div>
-                            <button class="btn" style="padding:6px 14px; font-size:0.8rem;" onclick="openChatView(${t.id})">Open Chat</button>
-                        </div>
-                    `;
-                });
-            }
-
-            if (closedList.length === 0) {
-                closedContainer.innerHTML = `<p style="color:var(--text-muted); font-size:0.85rem; padding:10px 0;">No recent or closed tickets.</p>`;
-            } else {
-                closedList.forEach(t => {
-                    closedContainer.innerHTML += `
-                        <div class="ticket-list-item" style="opacity: 0.7;">
-                            <div>
-                                <strong>#${t.id} - ${t.category}</strong> <span style="color:var(--text-muted); font-size:0.8rem;">(IGN: ${t.ign})</span>
-                                <p style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Status: Closed / Resolved</p>
-                            </div>
-                            <button class="btn btn-secondary" style="padding:6px 14px; font-size:0.8rem;" onclick="openChatView(${t.id})">View History</button>
-                        </div>
-                    `;
-                });
-            }
+            mine.filter(t => t.status === "Open").forEach(t => {
+                opened.innerHTML += `<div class="ticket-list-item"><div><b>#${t.id} - ${t.category}</b> (IGN: ${t.ign})</div><button class="btn" onclick="openChatView(${t.id})">Open Chat</button></div>`;
+            });
+            mine.filter(t => t.status === "Closed").forEach(t => {
+                closed.innerHTML += `<div class="ticket-list-item" style="opacity:0.7"><div><b>#${t.id} - ${t.category}</b> (Closed)</div><button class="btn btn-secondary" onclick="openChatView(${t.id})">View</button></div>`;
+            });
         }
 
-        function openChatView(ticketId) {
-            activeTicketId = ticketId;
-            let ticket = ticketsDatabase.find(t => t.id === activeTicketId);
-            if (ticket && ticket.unreadCounts) {
-                if (currentSession.isStaff) {
-                    ticket.unreadCounts.staff = 0;
-                } else {
-                    ticket.unreadCounts.player = 0;
-                }
-                db.ref('tickets').set(ticketsDatabase);
-            }
-
+        function openChatView(id) {
+            activeTicketId = id;
             hideAllViews();
             document.getElementById('view-chat').classList.remove('hidden');
-            renderChatMessages();
-            renderPlayerQuickRepliesBar();
-        }
-
-        function renderPlayerQuickRepliesBar() {
-            const ticket = ticketsDatabase.find(t => t.id === activeTicketId);
-            const qrBar = document.getElementById('quick-replies-bar');
-            qrBar.innerHTML = "";
-            if (!ticket || ticket.status === "Closed") return;
-
-            let pData = profilesDatabase[currentSession.identifier] || { ign: currentSession.isStaff ? currentSession.name : "Player", platform: "Java", version: "1.21.11" };
-
-            qrBar.innerHTML += `<button class="qr-btn" onclick="sendPlayerQuickReply('My username is ${pData.ign} and my platform is ${pData.platform || 'Java'}.')">1. Provide username & platform</button>`;
-            qrBar.innerHTML += `<button class="qr-btn" onclick="sendPlayerQuickReply('I am on version ${pData.version || '1.21.11'}.')">2. What version are you on?</button>`;
-
-            if (ticket.category === "General Support" || ticket.category === "Bug support" || ticket.category === "Player report") {
-                qrBar.innerHTML += `<button class="qr-btn" onclick="fillInputBox('Medal clip: Your medal clip link here!')">3. Send Clip (Medal)</button>`;
-                qrBar.innerHTML += `<button class="qr-btn" onclick="sendPlayerQuickReply('I don\'t have one')">I don't have one</button>`;
-            } else if (ticket.category === "Purchase support") {
-                qrBar.innerHTML += `<button class="qr-btn" onclick="sendPlayerQuickReply('Here is my receipt code: TEBEX-123456')">3. Provide Receipt</button>`;
-                qrBar.innerHTML += `<button class="qr-btn" onclick="sendPlayerQuickReply('I dont have a receipt')">I dont have one</button>`;
-            } else if (ticket.category === "Media application") {
-                qrBar.innerHTML += `<button class="qr-btn" onclick="fillInputBox('Medal clip: Your medal clip link here!')">3. Send Analytics Clip</button>`;
-            } else if (ticket.category === "Ban appeal") {
-                qrBar.innerHTML += `<button class="qr-btn" onclick="sendPlayerQuickReply('Ban reason: Lag, ban time: 1 day, date: today. I don\'t have a clip.')">3. Ban details & clip info</button>`;
-            }
-        }
-
-        function fillInputBox(text) {
-            const inputField = document.getElementById('chat-message-input');
-            inputField.value = text;
-            inputField.focus();
-        }
-
-        function incrementUnread(ticket, senderType) {
-            if (!ticket.unreadCounts) ticket.unreadCounts = { player: 0, staff: 0 };
-            const isViewingChat = activeTicketId === ticket.id && !document.getElementById('view-chat').classList.contains('hidden');
-            
-            if (!isViewingChat) {
-                if (senderType === 'staff') {
-                    ticket.unreadCounts.player += 1;
-                } else {
-                    ticket.unreadCounts.staff += 1;
-                }
-            }
-        }
-
-        function sendPlayerQuickReply(text) {
-            const ticket = ticketsDatabase.find(t => t.id === activeTicketId);
-            if (!ticket || ticket.status === "Closed") return;
-
-            let pData = profilesDatabase[currentSession.identifier] || { ign: ticket.ign };
-            
-            ticket.messages.push({ sender: pData.ign, text: text });
-            incrementUnread(ticket, 'player');
-
-            setTimeout(() => {
-                let botReply = "";
-                let textLower = text.toLowerCase();
-
-                if (textLower.includes("username") || textLower.includes("platform")) {
-                    botReply = `What version are you on? Exp. ${pData.version || '1.21.11'}`;
-                } else if (textLower.includes("version")) {
-                    if (ticket.category === "General Support" || ticket.category === "Bug support") {
-                        botReply = `What are you experiencing? If you do have a clip please send it to us for evidence to fix the bug.`;
-                    } else if (ticket.category === "Purchase support") {
-                        botReply = `Please make sure that you provide your ticket receipt so our staff can verify your order! Dont have a recipt say "I dont have one"! Please note having your tebex recipt code will help speed up the process!`;
-                    } else if (ticket.category === "Media application") {
-                        botReply = `Hello! To verify your application status, please send a clip via medal to us of you youtube analitics! remeber your quota! 5 avg. viewers on a stream and 850 viewers on a longform video or 1k on a shortform`;
-                    } else if (ticket.category === "Ban appeal") {
-                        botReply = `Please descibe why you got banned. make sure you include the bantime, ban reason, date you got banned, and ensure you have a clip. (dont have a clip make sure to say somewhere in your tesxt i dont have a clip.)`;
-                    } else if (ticket.category === "Player report") {
-                        botReply = `Please state the user of the player your reporting and if you have a clip please send it to shorten the procsess!`;
-                    }
-                } else if (textLower.includes("https://medal.tv") || textLower.includes("medal.tv") || textLower.includes("medal clip:")) {
-                    if (ticket.category === "Media application") {
-                        botReply = `after clip please be patiant while out staff handles this! you will get a responce soon!`;
-                    } else {
-                        botReply = `Thanks for the clip ${pData.ign}! We will getour staff here shortly.`;
-                    }
-                } else if (textLower.includes("i don't have one") || textLower.includes("i dont have one")) {
-                    if (ticket.category === "General Support" || ticket.category === "Bug support") {
-                        botReply = `The clip is invalid, please send a valid clip! No clip then say I dont have one. Thanks for the clip ${pData.ign}! We will getour staff here shortly.`;
-                    } else {
-                        botReply = `Thanks for sharing that with us! We will get staff on your way.`;
-                    }
-                } else if (ticket.category === "Purchase support" && (textLower.includes("receipt") || textLower.includes("tebex"))) {
-                    botReply = `Thanks for sharing that with us! We will get staff on your way.`;
-                } else if (ticket.category === "Ban appeal") {
-                    botReply = `a staff will be with you soon!`;
-                } else if (ticket.category === "Player report") {
-                    botReply = `tThanks for the report wwe will contact the staff shrotly`;
-                } else {
-                    if (ticket.category === "General Support") {
-                        botReply = `Thanks for detailing your experience! Staff will be with you shortly.`;
-                    }
-                }
-
-                if (botReply) {
-                    ticket.messages.push({ sender: "DupeSMP Bot", text: botReply });
-                    incrementUnread(ticket, 'staff');
-                    db.ref('tickets').set(ticketsDatabase);
-                }
-            }, 500);
-
-            db.ref('tickets').set(ticketsDatabase);
             renderChatMessages();
         }
 
         function renderChatMessages() {
             const ticket = ticketsDatabase.find(t => t.id === activeTicketId);
             if (!ticket) return;
-
-            document.getElementById('chat-header-title').innerText = `#${ticket.id} - ${ticket.category} (${ticket.ign})`;
-            document.getElementById('chat-header-status').innerText = `Status: ${ticket.status}`;
-            
-            const closeBtn = document.getElementById('close-ticket-btn');
-            const inputRow = document.getElementById('chat-input-row');
-            const qrBar = document.getElementById('quick-replies-bar');
-
-            if (ticket.status === "Closed") {
-                closeBtn.innerText = "Reopen Ticket";
-                closeBtn.className = "btn";
-                inputRow.style.display = "none";
-                qrBar.style.display = "none";
-            } else {
-                closeBtn.innerText = "Close Ticket";
-                closeBtn.className = "btn btn-danger";
-                inputRow.style.display = "flex";
-                qrBar.style.display = "flex";
-            }
-
-            const msgBox = document.getElementById('chat-messages-box');
-            msgBox.innerHTML = "";
-
+            document.getElementById('chat-header-title').innerText = `#${ticket.id} - ${ticket.category}`;
+            const box = document.getElementById('chat-messages-box');
+            box.innerHTML = "";
             ticket.messages.forEach(m => {
-                let msgClass = "user";
-                let displayName = m.sender;
-
-                if (m.sender === "DupeSMP Bot") {
-                    msgClass = "bot";
-                } else if (allowedStaffNames.includes(m.sender.toUpperCase()) || m.sender === "Zanecpvp") {
-                    msgClass = "admin";
-                    displayName = m.sender;
-                } else {
-                    displayName = ticket.ign;
-                }
-                
-                msgBox.innerHTML += `
-                    <div class="chat-msg ${msgClass}">
-                        <div style="font-size:0.7rem; color:var(--text-muted); margin-bottom:2.5px; font-weight:600;">${displayName}</div>
-                        <div>${m.text}</div>
-                    </div>
-                `;
+                let cls = m.sender.includes("Bot") ? "bot" : (m.sender === currentSession.identifier ? "user" : "admin");
+                box.innerHTML += `<div class="chat-msg ${cls}"><b style="font-size:0.75rem; color:var(--text-muted);">${m.sender}</b><br>${m.text}</div>`;
             });
-            msgBox.scrollTop = msgBox.scrollHeight;
+            box.scrollTop = box.scrollHeight;
         }
 
         function sendChatMessage() {
-            const textInput = document.getElementById('chat-message-input');
-            const text = textInput.value.trim();
-            if (!text) return;
-
+            const input = document.getElementById('chat-message-input');
+            const txt = input.value.trim();
+            if (!txt) return;
             const ticket = ticketsDatabase.find(t => t.id === activeTicketId);
-            if (!ticket || ticket.status === "Closed") return;
-
-            let pData = profilesDatabase[currentSession.identifier] || { ign: currentSession.name };
-            const senderLabel = currentSession.isStaff ? currentSession.name : pData.ign;
-
-            ticket.messages.push({ sender: senderLabel, text: text });
-            
-            if (currentSession.isStaff) {
-                incrementUnread(ticket, 'staff');
-            } else {
-                incrementUnread(ticket, 'player');
-            }
-
-            setTimeout(() => {
-                let botFollowUp = "";
-                let textLower = text.toLowerCase();
-
-                if (!currentSession.isStaff) {
-                    if (ticket.category === "General Support") {
-                        botFollowUp = `Thanks for detailing your experience! Staff will be with you shortly.`;
-                    } else if (ticket.category === "Bug support" || ticket.category === "Player report") {
-                        if (textLower.includes("medal clip:")) {
-                            botFollowUp = `Thanks for the clip ${pData.ign}! We will getour staff here shortly.`;
-                        }
-                    }
-                }
-
-                if (botFollowUp) {
-                    ticket.messages.push({ sender: "DupeSMP Bot", text: botFollowUp });
-                    incrementUnread(ticket, 'staff');
-                    db.ref('tickets').set(ticketsDatabase);
-                }
-            }, 500);
-
+            ticket.messages.push({ sender: currentSession.identifier, text: txt });
             db.ref('tickets').set(ticketsDatabase);
-            textInput.value = "";
+            input.value = "";
             renderChatMessages();
-            renderPlayerQuickRepliesBar();
-        }
-
-        function toggleCloseTicket() {
-            const ticket = ticketsDatabase.find(t => t.id === activeTicketId);
-            if (!ticket) return;
-
-            ticket.status = ticket.status === "Open" ? "Closed" : "Open";
-            db.ref('tickets').set(ticketsDatabase, () => {
-                renderChatMessages();
-                renderPlayerQuickRepliesBar();
-            });
         }
 
         function goHome() {
@@ -1385,29 +1435,12 @@
             hideAllViews();
             document.getElementById('view-profile').classList.remove('hidden');
             document.getElementById('prof-code').value = currentSession.identifier;
-            
-            let pData = profilesDatabase[currentSession.identifier];
-            if (pData) {
-                document.getElementById('prof-ign').value = pData.ign || "";
-                document.getElementById('prof-disc').value = pData.disc || "";
-                document.getElementById('prof-version').value = pData.version || "1.21.11";
-                document.getElementById('prof-yt').value = pData.yt || "";
-                document.getElementById('prof-twitch').value = pData.twitch || "";
-                document.getElementById('prof-tiktok').value = pData.tiktok || "";
-                if (pData.platform) setPlatform(pData.platform);
-            } else {
-                document.getElementById('prof-ign').value = currentSession.isStaff ? currentSession.name : "";
-                document.getElementById('prof-disc').value = "";
-                document.getElementById('prof-version').value = "1.21.11";
-                document.getElementById('prof-yt').value = "";
-                document.getElementById('prof-twitch').value = "";
-                document.getElementById('prof-tiktok').value = "";
-                setPlatform("Java");
-            }
         }
 
         function hideAllViews() {
             document.getElementById('view-home').classList.add('hidden');
+            document.getElementById('view-applications').classList.add('hidden');
+            document.getElementById('view-app-form').classList.add('hidden');
             document.getElementById('view-profile').classList.add('hidden');
             document.getElementById('view-chat').classList.add('hidden');
         }
